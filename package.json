@@ -1,0 +1,7 @@
+{
+  "name": "SNES_FAI",
+  "version": "0.0.0",
+  "dependencies": {
+    "neataptic": "^1.4.7"
+  }
+}
