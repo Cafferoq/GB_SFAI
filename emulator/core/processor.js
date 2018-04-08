@@ -161,7 +161,12 @@ var Z80 = function(){
 
   //ADD A, (HL) #0x86
   this.ADDr_hl = function(){
-    //TODO
+    var temp = this._registers.a + this._memoryUnit.readByte((this._registers.h << 8) + this._registers.l);
+    this._flags.halfCarry = ((temp & 0xF) < (this._registers.a & 0xF));
+    this._flags.carry = temp > 0xFF;
+    this._registers.a = temp & 0xFF;
+    this._flags.zero = this._registers.a == 0;
+    this._flags.subtract = false;
   };
 
   /**---------------------End ADD Operations-------------------------------------**/
@@ -255,6 +260,52 @@ var Z80 = function(){
 
   /**---------------------End POP Operations-------------------------------------**/
 
+  //LD BC, nn #0x01
+  this.LDBCnn = function(){
+    this._registers.c = this._memoryUnit.readByte(this._registers.pc);
+    this._registers.pc++;
+    this._registers.b = this._memoryUnit.readByte(this._registers.pc);
+    this._registers.pc++;
+    this._registers.m = 3;
+    this._registers.t = 12;
+  };
+
+  //LD DE, nn #0x11
+  this.LDDEnn = function(){
+    this._registers.e = this._memoryUnit.readByte(this._registers.pc);
+    this._registers.pc++;
+    this._registers.d = this._memoryUnit.readByte(this._registers.pc);
+    this._registers.pc++;
+    this._registers.m = 3;
+    this._registers.t = 12;
+  };
+
+  //LD HL, nn #0x21
+  this.LDHLnn = function(){
+    this._registers.l = this._memoryUnit.readByte(this._registers.pc);
+    this._registers.pc++;
+    this._registers.h = this._memoryUnit.readByte(this._registers.pc);
+    this._registers.pc++;
+    this._registers.m = 3;
+    this._registers.t = 12;
+  };
+
+  //LD SP, nn #0x31
+  this.LDSPnn = function(){
+    this._registers.sp = this._memoryUnit.readWord(this._registers.pc);
+    this._registers.pc += 2;
+    this._registers.m = 3;
+    this._registers.t = 12;
+  };
+
+  //LD (BC), A #0x02
+  this.LDBCmA = function(){
+    this._memoryUnit.writeByte((this._registers.b << 8) + this._registers.c,
+      this._registers.a);
+    this._registers.m = 2;
+    this._registers.t = 8;
+  };
+
   //NOP  #0x00
   this.NOP = function(){
     this._registers.m = 1;
@@ -263,7 +314,9 @@ var Z80 = function(){
 
   //Map the instructions to their op codes.
   this._instructionMap = [
-    this.NOP
+    this.NOP,
+    this.LDBCnn,
+    this.LDBCmA
   ];
 
   this.init(...arguments); //Call init with arguments passed in.
