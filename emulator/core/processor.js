@@ -203,6 +203,24 @@ var Z80 = function(){
       this._registers.m = 3; 
 	  this._registers.t = 12;
   };
+  
+  //ADD HL, HL #0x29
+  this.ADDHL_HL = function(){
+	  var tempHL = (this._registers.h << 8) + this._registers.l;
+	
+	  this._flags.halfCarry = (tempHL & 0xFFF) > 0x7FF;
+	  this._flags.carry = tempHL > 0x7FFF;
+	  
+	  tempHL = (tempHL << 1) & 0xFFFF;
+	  
+	  this._flags.subtract = false;
+	  
+	  this._registers.h = (tempHL >> 8) & 0xFF;
+	  this._registers.l = tempHL & 0xFF;
+	  
+	  this._registers.m = 3;
+	  this._registers.t = 12;
+  };
 
   /**---------------------End ADD Operations-------------------------------------**/
 
@@ -360,6 +378,19 @@ var Z80 = function(){
 	  
     this._registers.m = 2;
     this._registers.t = 8;
+  };
+  
+  //LDI A, (HL) #0x2A Load register A from address (HL) and increment HL.
+  this.LDIAHL = function(){
+	  this._registers.a = this._memoryUnit.readByte((this._registers.h << 8) + this._registers.l);
+	  this._registers.l++;
+	  this._registers.l &= 0xFF;
+	  
+	  if(this._registers.l == 0)
+		  this._registers.h = (this._registers.h + 1) & 0xFF;
+	  
+	  this._registers.m = 2;
+	  this._registers.t = 8;
   };
   
   //LDD (HL), A #0x32
@@ -769,6 +800,16 @@ var Z80 = function(){
 	  this._registers.t = 4;
   };
   
+  // DEC HL #0x2B Decrement HL as a 16 bit value.
+  this.DEC_hl = function(){
+	  this._registers.l = (this._registers.l - 1) & 0xFF;
+	  if(this._registers.l == 0xFF)
+		  this._registers.h = (this._registers.h - 1) & 0xFF;
+	  
+	  this._registers.m = 1;
+	  this._registers.t = 4;  
+  };
+  
   /**------------------ 16b DEC Operation----------------------------------------**/
   
   /**------------------ 16b INC Operation----------------------------------------**/
@@ -822,6 +863,40 @@ var Z80 = function(){
 	  this._registers.t = 12;
   };
   
+  //JR NZ, n #0x20 Relative jump if last result not zero
+  this.JRNZ_n = function(){
+	  var temp = this._memoryUnit.readByte(this._registers.pc);
+	  if (temp > 127)
+		  temp = -((~temp & 0xFF);
+	  
+	  this._registers.pc++;
+	  this._registers.m = 2;
+	  this._registers.t = 8;
+	  
+	  if(!this._flags.zero){
+		  this._registers.pc += temp;
+		  this._registers.m++;
+		  this._registers.t += 4;
+	  }
+  };
+  
+  //JR Z, n #0x20 Relative jump if last result zero
+  this.JRZ_n = function(){
+	  var temp = this._memoryUnit.readByte(this._registers.pc);
+	  if (temp > 127)
+		  temp = -((~temp & 0xFF);
+	  
+	  this._registers.pc++;
+	  this._registers.m = 2;
+	  this._registers.t = 8;
+	  
+	  if(this._flags.zero){
+		  this._registers.pc += temp;
+		  this._registers.m++;
+		  this._registers.t += 4;
+	  }
+  };
+  
   
   
   /**---------------End Jump Operations------------------------------------------**/
@@ -857,6 +932,43 @@ var Z80 = function(){
 
     this._registers.m = 1;
     this._registers.t = 4;
+  };
+  
+  //DAA #0x27 (Ready register A for BCD addition
+  this.DAA = function(){
+	  if(!this._flags.subtract){
+		  
+		  if(this._flags.carry || this._registers.a > 0x99){
+			  this._registers.a = (this._registers.a + 0x60) & 0xFF;
+			  this._flags.carry = true;
+		  }
+		  
+		  if(this._flags.halfCarry || (this._registers.a + 0x0F) & 0x09){
+			  this._registers.a = (this._registers.a + 0x06) & 0xFF;
+			  this._flags.halfCarry = false;
+		  }
+		  
+	  } else if(this._flags.carry && this._flags.halfCarry){
+		
+		  this._registers.a = (this._registers.a + 0x9A) & 0xFF;
+		  this._flags.halfCarry = false;
+	  
+	  } else if(this._flags.carry){
+		
+		  this._registers.a = (this._registers.a + 0xA0) & 0xFF;
+	  
+	  } else if(this._flags.halfCarry){
+		  
+		  this._registers.a = (this._registers.a + 0xFA) & 0xFF;
+		  this._flags.halfCarry = false;
+	  
+	  }
+	  
+	  this._flags.zero = this._registers.a == 0;
+	  
+	  //Had to do some research to find this clock time. May be wrong.
+	  this._registers.m = 1;
+	  this._registers.t = 4;
   };
   
   /**-------------------END Misc Operations---------------------------------------**/
@@ -898,10 +1010,27 @@ var Z80 = function(){
 	this.INC_e,
 	this.DEC_e,
 	this.LDE_n,
-	this.RRA
+	this.RRA,
 	
 	// 20
+	this.JRNZ_n,
+	this.LDHLnn,
+	this.LDIHLA,
+	this.INC_hl,
+	this.INC_h,
+	this.DEC_h,
+	this.LDH_n,
+	this.DAA,
+	this.JRZ_n,
+	this.ADDHL_HL,
+	this.LDIAHL,
+	this.DEC_hl,
+	this.INC_l,
+	this.DEC_l,
+	this.LDL_n,
+	this.CPL
 	
+	// 30
   ];
 
   this.init(...arguments); //Call init with arguments passed in.
