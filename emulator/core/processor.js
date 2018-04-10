@@ -1884,6 +1884,221 @@ var Z80 = function(){
   
   /**---------------End Jump Operations------------------------------------------**/
   
+  /**-------------------AND Operations-------------------------------------------**/
+  
+  //AND B 0xA0 Logical AND B against A
+  this.ANDB = function(){
+	  this._registers.a &= this._registers.b;
+	  
+	  this._flags.zero = this._registers.a == 0;
+	  this._flags.halfCarry = true;
+	  this._flags.subtract = false;
+	  this._flags.carry = false;
+	  	
+      this._registers.m = 1;
+      this._registers.t = 4;
+  };
+  
+  //AND C 0xA1 Logical AND C against A
+  this.ANDC = function(){
+	  this._registers.a &= this._registers.c;
+	  
+	  this._flags.zero = this._registers.a == 0;
+	  this._flags.halfCarry = true;
+	  this._flags.subtract = false;
+	  this._flags.carry = false;
+	  	
+      this._registers.m = 1;
+      this._registers.t = 4;
+  };
+ 
+  //AND D 0xA2 Logical AND D against A
+  this.ANDD = function(){
+	  this._registers.a &= this._registers.d;
+	  
+	  this._flags.zero = this._registers.a == 0;
+	  this._flags.halfCarry = true;
+	  this._flags.subtract = false;
+	  this._flags.carry = false;
+	  	
+      this._registers.m = 1;
+      this._registers.t = 4;
+  };
+ 
+  //AND E 0xA3 Logical AND E against A
+  this.ANDE = function(){
+	  this._registers.a &= this._registers.e;
+	  
+	  this._flags.zero = this._registers.a == 0;
+	  this._flags.halfCarry = true;
+	  this._flags.subtract = false;
+	  this._flags.carry = false;
+	  	
+      this._registers.m = 1;
+      this._registers.t = 4;
+  };
+ 
+  //AND H 0xA4 Logical AND H against A
+  this.ANDH = function(){
+	  this._registers.a &= this._registers.h;
+	  
+	  this._flags.zero = this._registers.a == 0;
+	  this._flags.halfCarry = true;
+	  this._flags.subtract = false;
+	  this._flags.carry = false;
+	  	
+      this._registers.m = 1;
+      this._registers.t = 4;
+  };
+ 
+  //AND L 0xA5 Logical AND L against A
+  this.ANDL = function(){
+	  this._registers.a &= this._registers.l;
+	  
+	  this._flags.zero = this._registers.a == 0;
+	  this._flags.halfCarry = true;
+	  this._flags.subtract = false;
+	  this._flags.carry = false;
+	  	
+      this._registers.m = 1;
+      this._registers.t = 4;
+  };
+  
+  //AND (HL) 0xA6 Logical AND of value at address (HL) against A
+  this.ANDhl = function(){
+	  this._registers.a &= this._memoryUnit.readByte((this._registers.h << 8) + this._registers.l);
+	  
+	  this._flags.zero = this._registers.a == 0;
+	  this._flags.halfCarry = true;
+	  this._flags.subtract = false;
+	  this._flags.carry = false;
+	  	
+      this._registers.m = 2;
+      this._registers.t = 8;
+  };
+ 
+  //AND A 0xA7 Logical AND A against A
+  this.ANDA = function(){
+	  // x & x = x
+	  
+	  this._flags.zero = this._registers.a == 0;
+	  this._flags.halfCarry = true;
+	  this._flags.subtract = false;
+	  this._flags.carry = false;
+	  	
+      this._registers.m = 1;
+      this._registers.t = 4;
+  };  
+  /**-----------------END AND Operations-----------------------------------------**/
+  
+  /**-------------------XOR Operations-------------------------------------------**/
+  
+  //XOR B 0xA8 Logical XOR B against A
+  this.XORB = function(){
+	  this._registers.a ^= this._registers.b;
+	  
+	  this._flags.zero = this._registers.a == 0;
+	  this._flags.halfCarry = false;
+	  this._flags.subtract = false;
+	  this._flags.carry = false;
+	  	
+      this._registers.m = 1;
+      this._registers.t = 4;
+  };
+  
+  //XOR C 0xA9 Logical XOR C against A
+  this.XORC = function(){
+	  this._registers.a ^= this._registers.c;
+	  
+	  this._flags.zero = this._registers.a == 0;
+	  this._flags.halfCarry = false;
+	  this._flags.subtract = false;
+	  this._flags.carry = false;
+	  	
+      this._registers.m = 1;
+      this._registers.t = 4;
+  };
+ 
+  //XOR D 0xAA Logical XOR D against A
+  this.XORD = function(){
+	  this._registers.a ^= this._registers.d;
+	  
+	  this._flags.zero = this._registers.a == 0;
+	  this._flags.halfCarry = false;
+	  this._flags.subtract = false;
+	  this._flags.carry = false;
+	  	
+      this._registers.m = 1;
+      this._registers.t = 4;
+  };
+ 
+  //XOR E 0xAB Logical XOR E against A
+  this.XORE = function(){
+	  this._registers.a ^= this._registers.e;
+	  
+	  this._flags.zero = this._registers.a == 0;
+	  this._flags.halfCarry = false;
+	  this._flags.subtract = false;
+	  this._flags.carry = false;
+	  	
+      this._registers.m = 1;
+      this._registers.t = 4;
+  };
+ 
+  //XOR H 0xAC Logical XOR H against A
+  this.XORH = function(){
+	  this._registers.a ^= this._registers.h;
+	  
+	  this._flags.zero = this._registers.a == 0;
+	  this._flags.halfCarry = false;
+	  this._flags.subtract = false;
+	  this._flags.carry = false;
+	  	
+      this._registers.m = 1;
+      this._registers.t = 4;
+  };
+ 
+  //XOR L 0xAD Logical XOR L against A
+  this.XORL = function(){
+	  this._registers.a ^= this._registers.l;
+	  
+	  this._flags.zero = this._registers.a == 0;
+	  this._flags.halfCarry = false;
+	  this._flags.subtract = false;
+	  this._flags.carry = false;
+	  	
+      this._registers.m = 1;
+      this._registers.t = 4;
+  };
+  
+  //XOR (HL) 0xAE Logical XOR of value at address (HL) against A
+  this.XORhl = function(){
+	  this._registers.a ^= this._memoryUnit.readByte((this._registers.h << 8) + this._registers.l);
+	  
+	  this._flags.zero = this._registers.a == 0;
+	  this._flags.halfCarry = false;
+	  this._flags.subtract = false;
+	  this._flags.carry = false;
+	  	
+      this._registers.m = 2;
+      this._registers.t = 8;
+  };
+ 
+  //XOR A 0xAF Logical XOR A against A
+  this.XORA = function(){
+	  // x XOR x = 0
+	  this._registers.a = 0;
+	  
+	  this._flags.zero = false;
+	  this._flags.halfCarry = false;
+	  this._flags.subtract = false;
+	  this._flags.carry = false;
+	  	
+      this._registers.m = 1;
+      this._registers.t = 4;
+  };  
+  /**-----------------END XOR Operations-----------------------------------------**/
+  
   /**-------------------Misc Operations------------------------------------------**/
   
   //NOP  #0x00 (No-op)
@@ -2118,7 +2333,7 @@ var Z80 = function(){
 	this.LDA_hl,
 	this.LDAA,
 	
-	//80
+	// 80
 	this.ADD_b,
 	this.ADD_c,
 	this.ADD_d,
@@ -2136,7 +2351,7 @@ var Z80 = function(){
 	this.ADCAhl,
 	this.ADCAA,
 	
-	//90
+	// 90
 	this.SUBAB,
 	this.SUBAC,
 	this.SUBAD,
@@ -2152,7 +2367,27 @@ var Z80 = function(){
 	this.SBCAH,
 	this.SBCAL,
 	this.SBCAhl,
-	this.SBCAA
+	this.SBCAA,
+	
+	// A0
+	this.ANDB,
+	this.ANDC,
+	this.ANDD,
+	this.ANDE,
+	this.ANDH,
+	this.ANDL,
+	this.ANDhl,
+	this.ANDA,
+	this.XORB,
+	this.XORC,
+	this.XORD,
+	this.XORE,
+	this.XORH,
+	this.XORL,
+	this.XORhl,
+	this.XORA
+	
+	// B0
   ];
 
   this.init(...arguments); //Call init with arguments passed in.
