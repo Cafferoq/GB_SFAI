@@ -238,8 +238,148 @@ var Z80 = function(){
 	  this._registers.t = 12;
   };
 
-  /**---------------------End ADD Operations-------------------------------------**/
+  /**---------------------End ADD Operations----------------------------------**/
 
+  /**---------------------End ADC Operations----------------------------------**/
+
+  //ADC A, B #0x88 Add B and Carry to A
+  this.ADCAB = function(){
+	  var temp = this._registers.a + this._registers.b + (this._flags.carry ? 1 : 0);
+	  
+	  this._flags.halfCarry = ((this._registers.a & 0xF) + (this._registers.b & 0xF) + (this._flags.carry ? 1 : 0)) > 0xF;
+	  this._flags.carry = temp > 0xFF;
+	  
+	  this._registers.a = temp & 0xFF;
+	  
+	  this._flags.zero = this._registers.a == 0;
+	  
+	  this._flags.subtract = false;
+	  	  
+	  this._registers.m = 1;
+	  this._registers.t = 4;
+  };
+
+  //ADC A, C #0x89 Add C and Carry to A
+  this.ADCAC = function(){
+	  var temp = this._registers.a + this._registers.c + (this._flags.carry ? 1 : 0);
+	  
+	  this._flags.halfCarry = ((this._registers.a & 0xF) + (this._registers.c & 0xF) + (this._flags.carry ? 1 : 0)) > 0xF;
+	  this._flags.carry = temp > 0xFF;
+	  
+	  this._registers.a = temp & 0xFF;
+	  
+	  this._flags.zero = this._registers.a == 0;
+	  
+	  this._flags.subtract = false;
+	  	  
+	  this._registers.m = 1;
+	  this._registers.t = 4;
+  };
+
+  //ADC A, D #0x8A Add D and Carry to A
+  this.ADCAD = function(){
+	  var temp = this._registers.a + this._registers.d + (this._flags.carry ? 1 : 0);
+	  
+	  this._flags.halfCarry = ((this._registers.a & 0xF) + (this._registers.d & 0xF) + (this._flags.carry ? 1 : 0)) > 0xF;
+	  this._flags.carry = temp > 0xFF;
+	  
+	  this._registers.a = temp & 0xFF;
+	  
+	  this._flags.zero = this._registers.a == 0;
+	  
+	  this._flags.subtract = false;
+	  	  
+	  this._registers.m = 1;
+	  this._registers.t = 4;
+  };
+
+  //ADC A, E #0x8B Add E and Carry to A
+  this.ADCAE = function(){
+	  var temp = this._registers.a + this._registers.e + (this._flags.carry ? 1 : 0);
+	  
+	  this._flags.halfCarry = ((this._registers.a & 0xF) + (this._registers.e & 0xF) + (this._flags.carry ? 1 : 0)) > 0xF;
+	  this._flags.carry = temp > 0xFF;
+	  
+	  this._registers.a = temp & 0xFF;
+	  
+	  this._flags.zero = this._registers.a == 0;
+	  
+	  this._flags.subtract = false;
+	  	  
+	  this._registers.m = 1;
+	  this._registers.t = 4;
+  };
+
+  //ADC A, H #0x8C Add H and Carry to A
+  this.ADCAH = function(){
+	  var temp = this._registers.a + this._registers.h + (this._flags.carry ? 1 : 0);
+	  
+	  this._flags.halfCarry = ((this._registers.a & 0xF) + (this._registers.h & 0xF) + (this._flags.carry ? 1 : 0)) > 0xF;
+	  this._flags.carry = temp > 0xFF;
+	  
+	  this._registers.a = temp & 0xFF;
+	  
+	  this._flags.zero = this._registers.a == 0;
+	  
+	  this._flags.subtract = false;
+	  	  
+	  this._registers.m = 1;
+	  this._registers.t = 4;
+  };
+
+  //ADC A, L #0x8D Add L and Carry to A
+  this.ADCAB = function(){
+	  var temp = this._registers.a + this._registers.l + (this._flags.carry ? 1 : 0);
+	  
+	  this._flags.halfCarry = ((this._registers.a & 0xF) + (this._registers.l & 0xF) + (this._flags.carry ? 1 : 0)) > 0xF;
+	  this._flags.carry = temp > 0xFF;
+	  
+	  this._registers.a = temp & 0xFF;
+	  
+	  this._flags.zero = this._registers.a == 0;
+	  
+	  this._flags.subtract = false;
+	  	  
+	  this._registers.m = 1;
+	  this._registers.t = 4;
+  };  
+  
+  //ADC A, (HL) #0x8D Add value at (HL) in memory and Carry to A
+  this.ADCAhl = function(){
+	  var fromMem = this._memoryUnit.readByte((this._registers.h << 8) + this._registers.l);	  
+	  var temp = this._registers.a + fromMem + (this._flags.carry ? 1 : 0);
+	  
+	  this._flags.halfCarry = ((this._registers.a & 0xF) + (fromMem & 0xF) + (this._flags.carry ? 1 : 0)) > 0xF;
+	  this._flags.carry = temp > 0xFF;
+	  
+	  this._registers.a = temp & 0xFF;
+	  
+	  this._flags.zero = this._registers.a == 0;
+	  
+	  this._flags.subtract = false;
+	  
+	  this._registers.m = 2;
+	  this._registers.t = 8;
+  };
+  
+  //ADC A, A #0x8F Add A and Carry to A
+  this.ADCAA = function(){
+	  var temp = this._registers.a + this._registers.a + (this._flags.carry ? 1 : 0);
+	  
+	  this._flags.halfCarry = ((this._registers.a & 0xF) + (this._registers.a & 0xF) + (this._flags.carry ? 1 : 0)) > 0xF;
+	  this._flags.carry = temp > 0xFF;
+	  
+	  this._registers.a = temp & 0xFF;
+	  
+	  this._flags.zero = this._registers.a == 0;
+	  
+	  this._flags.subtract = false;
+	  	  
+	  this._registers.m = 1;
+	  this._registers.t = 4;
+  };
+  /**---------------------End ADC Operations----------------------------------**/
+  
   /**---------------------PUSH Operations-------------------------------------**/
 
   //PUSH BC #0xC5
@@ -1706,9 +1846,27 @@ var Z80 = function(){
 	this.LDAH,
 	this.LDAL,
 	this.LDA_hl,
-	this.LDAA
+	this.LDAA,
 	
 	//80
+	this.ADD_b,
+	this.ADD_c,
+	this.ADD_d,
+	this.ADD_e,
+	this.ADD_h,
+	this.ADD_l,
+	this.ADDr_hl,
+	this.ADD_a,
+	this.ADCAB,
+	this.ADCAC,
+	this.ADCAD,
+	this.ADCAE,
+	this.ADCAH,
+	this.ADCAL,
+	this.ADCAhl,
+	this.ADCAA
+	
+	//90
   ];
 
   this.init(...arguments); //Call init with arguments passed in.
