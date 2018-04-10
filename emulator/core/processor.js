@@ -221,6 +221,22 @@ var Z80 = function(){
 	  this._registers.m = 3;
 	  this._registers.t = 12;
   };
+  
+  //ADD HL, SP #0x39
+  this.ADDHL_SP = function(){
+	  var tempHL = (this._registers.h << 8) + this._registers.l;
+	  var tempSum = tempHL + this._registers.sp;
+	  
+	  this._flags.halfCarry = (tempHL & 0xFFF) > (tempSum & 0xFFF);
+	  this._flags.carry = tempSum > 0xFFFF;
+	  this._flags.subtract = false;
+	  
+	  this._registers.h = (tempSum >> 8) & 0xFF;
+	  this._registers.l = tempSum & 0xFF;
+	  	  
+	  this._registers.m = 3;
+	  this._registers.t = 12;
+  };
 
   /**---------------------End ADD Operations-------------------------------------**/
 
@@ -393,8 +409,21 @@ var Z80 = function(){
 	  this._registers.t = 8;
   };
   
+  //LDD A, (HL) #0x3A Load register A from address (HL) and decrement HL
+  this.LDDAHL = function(){
+	  this._registers.a = this._memoryUnit.readByte((this._registers.h << 8) + this._registers.l);
+	  this._registers.l--;
+	  this._registers.l &= 0xFF;
+	  
+	  if(this._registers.l == 0xFF)
+		  this._registers.h = (this._registers.h - 1) & 0xFF;
+	  
+	  this._registers.m = 2;
+	  this._registers.t = 8;
+  };
+  
   //LDD (HL), A #0x32
-  this.LDIHLA = function(){
+  this.LDDHLA = function(){
     this._memoryUnit.writeByte((this._registers.h << 8) + this._registers.l,
       this._registers.a);
 	 
@@ -810,6 +839,15 @@ var Z80 = function(){
 	  this._registers.t = 4;  
   };
   
+  // DEC SP #0x3B Decrement the 16 bit Stack Pointer
+  this.DEC_sp = function(){
+	  this._registers.sp --;
+	  this._registers.sp &= 0xFFFF;
+	  	  
+	  this._registers.m = 1;
+	  this._registers.t = 4;  
+  };
+  
   /**------------------ 16b DEC Operation----------------------------------------**/
   
   /**------------------ 16b INC Operation----------------------------------------**/
@@ -897,7 +935,39 @@ var Z80 = function(){
 	  }
   };
   
+  //JR NC, n 0x30 Relative jump if no carry flags
+  this.JRNC_n = function(){
+	  var temp = this._memoryUnit.readByte(this._registers.pc);
+	  if (temp > 127)
+		  temp = -((~temp & 0xFF);
+	  
+	  this._registers.pc++;
+	  this._registers.m = 2;
+	  this._registers.t = 8;
+	  
+	  if(!this._flags.carry){
+		  this._registers.pc += temp;
+		  this._registers.m++;
+		  this._registers.t += 4;
+	  }
+  };
   
+  //JR C, n 0x30 Relative jump if carry flag is set
+  this.JRC_n = function(){
+	  var temp = this._memoryUnit.readByte(this._registers.pc);
+	  if (temp > 127)
+		  temp = -((~temp & 0xFF);
+	  
+	  this._registers.pc++;
+	  this._registers.m = 2;
+	  this._registers.t = 8;
+	  
+	  if(this._flags.carry){
+		  this._registers.pc += temp;
+		  this._registers.m++;
+		  this._registers.t += 4;
+	  }
+  };
   
   /**---------------End Jump Operations------------------------------------------**/
   
@@ -971,6 +1041,16 @@ var Z80 = function(){
 	  this._registers.t = 4;
   };
   
+  //SCF #0x37 Set carry flag
+  this.SCF = function(){
+	  this._flags.carry = true;
+	  this._flags.subtract = false;
+	  this._flags.halfCarry = false;
+	  
+	  this._registers.m = 1;
+	  this._registers.t = 4;
+  };
+  
   /**-------------------END Misc Operations---------------------------------------**/
   
 
@@ -1028,9 +1108,27 @@ var Z80 = function(){
 	this.INC_l,
 	this.DEC_l,
 	this.LDL_n,
-	this.CPL
+	this.CPL,
 	
 	// 30
+	this.JRNC_n,
+	this.LDSPnn,
+	this.LDDHLA,
+	this.INC_sp,
+	this.INC_hlm,
+	this.DEC_hlm,
+	this.LDHLm_n,
+	this.SCF,
+	this.JRC_n,
+	this.ADDHL_SP,
+	this.LDDAHL,
+	this.DEC_sp,
+	this.INC_a,
+	this.DEC_a,
+	this.LDA_n,
+	this.CCF
+	
+	// 40
   ];
 
   this.init(...arguments); //Call init with arguments passed in.
