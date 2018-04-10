@@ -240,7 +240,7 @@ var Z80 = function(){
 
   /**---------------------End ADD Operations----------------------------------**/
 
-  /**---------------------End ADC Operations----------------------------------**/
+  /**-------------------------ADC Operations----------------------------------**/
 
   //ADC A, B #0x88 Add B and Carry to A
   this.ADCAB = function(){
@@ -344,7 +344,7 @@ var Z80 = function(){
 	  this._registers.t = 4;
   };  
   
-  //ADC A, (HL) #0x8D Add value at (HL) in memory and Carry to A
+  //ADC A, (HL) #0x8E Add value at (HL) in memory and Carry to A
   this.ADCAhl = function(){
 	  var fromMem = this._memoryUnit.readByte((this._registers.h << 8) + this._registers.l);	  
 	  var temp = this._registers.a + fromMem + (this._flags.carry ? 1 : 0);
@@ -379,6 +379,276 @@ var Z80 = function(){
 	  this._registers.t = 4;
   };
   /**---------------------End ADC Operations----------------------------------**/
+  
+  /**---------------------SUB Operations--------------------------------------**/
+  
+  //SUB A, B #0x90 Subtract B from A 
+  this.SUBAB = function(){
+	  var temp = this._registers.a - this._registers.b;
+	  
+	  this._flags.halfCarry = (this._registers.a & 0xF) < (temp & 0xF);
+	  this._flags.carry = dirtySum < 0;
+	  
+	  this._registers.a = temp & 0xFF;
+	  
+	  this._flags.zero = temp == 0;
+	  this._flags.subtract = true;
+	  
+	  this._registers.m = 1;
+	  this._registers.t = 4;
+  };
+  
+  //SUB A, C #0x91 Subtract C from A 
+  this.SUBAC = function(){
+	  var temp = this._registers.a - this._registers.c;
+	  
+	  this._flags.halfCarry = (this._registers.a & 0xF) < (temp & 0xF);
+	  this._flags.carry = dirtySum < 0;
+	  
+	  this._registers.a = temp & 0xFF;
+	  
+	  this._flags.zero = temp == 0;
+	  this._flags.subtract = true;
+	  
+	  this._registers.m = 1;
+	  this._registers.t = 4;
+  };
+  
+  //SUB A, D #0x92 Subtract D from A 
+  this.SUBAD = function(){
+	  var temp = this._registers.a - this._registers.d;
+	  
+	  this._flags.halfCarry = (this._registers.a & 0xF) < (temp & 0xF);
+	  this._flags.carry = dirtySum < 0;
+	  
+	  this._registers.a = temp & 0xFF;
+	  
+	  this._flags.zero = temp == 0;
+	  this._flags.subtract = true;
+	  
+	  this._registers.m = 1;
+	  this._registers.t = 4;
+  };
+  
+  //SUB A, E #0x93 Subtract E from A 
+  this.SUBAE = function(){
+	  var temp = this._registers.a - this._registers.e;
+	  
+	  this._flags.halfCarry = (this._registers.a & 0xF) < (temp & 0xF);
+	  this._flags.carry = dirtySum < 0;
+	  
+	  this._registers.a = temp & 0xFF;
+	  
+	  this._flags.zero = temp == 0;
+	  this._flags.subtract = true;
+	  
+	  this._registers.m = 1;
+	  this._registers.t = 4;
+  };
+  
+  //SUB A, H #0x94 Subtract H from A 
+  this.SUBAH = function(){
+	  var temp = this._registers.a - this._registers.h;
+	  
+	  this._flags.halfCarry = (this._registers.a & 0xF) < (temp & 0xF);
+	  this._flags.carry = dirtySum < 0;
+	  
+	  this._registers.a = temp & 0xFF;
+	  
+	  this._flags.zero = temp == 0;
+	  this._flags.subtract = true;
+	  
+	  this._registers.m = 1;
+	  this._registers.t = 4;
+  };
+  
+  //SUB A, L #0x95 Subtract L from A 
+  this.SUBAL = function(){
+	  var temp = this._registers.a - this._registers.l;
+	  
+	  this._flags.halfCarry = (this._registers.a & 0xF) < (temp & 0xF);
+	  this._flags.carry = dirtySum < 0;
+	  
+	  this._registers.a = temp & 0xFF;
+	  
+	  this._flags.zero = temp == 0;
+	  this._flags.subtract = true;
+	  
+	  this._registers.m = 1;
+	  this._registers.t = 4;
+  };
+  
+  //SUB A, (HL) #0x96 Subtract value at (HL) from A
+  this.SUBAhl = function(){
+	  var fromMem = this._memoryUnit.readByte((this._registers.h << 8) + this._registers.l);
+	  var temp = this._registers.a - fromMem;
+	  
+	  this._flags.halfCarry = (this._registers.a & 0xF) > (temp & 0xF);
+	  this._flags.carry = temp < 0;
+	  
+	  this._registers.a = temp & 0xFF;
+	  
+	  this._flags.zero = temp == 0;
+	  this._flags.subtract = true;
+	  
+	  this._registers.m = 2;
+	  this._registers.t = 8;
+  };
+  
+  //SUB A, A #0x97 Subtract A from A 
+  this.SUBAA = function(){
+	  this._registers.a = 0; // x - x = 0;
+	  
+	  this._flags.halfCarry = false;
+	  this._flags.carry = false;
+	  this._flags.zero = true;
+	  this._flags.subtract = true;
+	  
+	  this._registers.m = 1;
+	  this._registers.t = 4;
+  };
+  /**---------------------End SUB Operations----------------------------------**/
+  
+  /**-----------------------SBC Operations------------------------------------**/
+
+  //SBC A, B #0x98 Subtract B and Carry from A
+  this.SBCAB = function(){
+	  var temp = this._registers.a - this._registers.b - (this._flags.carry ? 1 : 0);
+	  
+	  this._flags.halfCarry = ((this._registers.a & 0xF) - (this._registers.b & 0xF) - (this._flags.carry ? 1 : 0)) > 0xF;
+	  this._flags.carry = temp < 0;
+	  
+	  this._registers.a = temp & 0xFF;
+	  
+	  this._flags.zero = this._registers.a == 0;
+	  
+	  this._flags.subtract = true;
+	  	  
+	  this._registers.m = 1;
+	  this._registers.t = 4;
+  };
+
+  //SBC A, C #0x99 Subtract C and Carry from A
+  this.SBCAC = function(){
+	  var temp = this._registers.a - this._registers.c - (this._flags.carry ? 1 : 0);
+	  
+	  this._flags.halfCarry = ((this._registers.a & 0xF) - (this._registers.c & 0xF) - (this._flags.carry ? 1 : 0)) > 0xF;
+	  this._flags.carry = temp < 0;
+	  
+	  this._registers.a = temp & 0xFF;
+	  
+	  this._flags.zero = this._registers.a == 0;
+	  
+	  this._flags.subtract = true;
+	  	  
+	  this._registers.m = 1;
+	  this._registers.t = 4;
+  };
+
+  //SBC A, D #0x9A Subtract D and Carry from A
+  this.SBCAD = function(){
+	  var temp = this._registers.a - this._registers.d - (this._flags.carry ? 1 : 0);
+	  
+	  this._flags.halfCarry = ((this._registers.a & 0xF) - (this._registers.d & 0xF) - (this._flags.carry ? 1 : 0)) > 0xF;
+	  this._flags.carry = temp < 0;
+	  
+	  this._registers.a = temp & 0xFF;
+	  
+	  this._flags.zero = this._registers.a == 0;
+	  
+	  this._flags.subtract = true;
+	  	  
+	  this._registers.m = 1;
+	  this._registers.t = 4;
+  };
+
+  //SBC A, E #0x9B Subtract E and Carry from A
+  this.SBCAE = function(){
+	  var temp = this._registers.a - this._registers.e - (this._flags.carry ? 1 : 0);
+	  
+	  this._flags.halfCarry = ((this._registers.a & 0xF) - (this._registers.e & 0xF) - (this._flags.carry ? 1 : 0)) > 0xF;
+	  this._flags.carry = temp < 0;
+	  
+	  this._registers.a = temp & 0xFF;
+	  
+	  this._flags.zero = this._registers.a == 0;
+	  
+	  this._flags.subtract = true;
+	  	  
+	  this._registers.m = 1;
+	  this._registers.t = 4;
+  };
+  
+  //SBC A, H #0x9C Subtract H and Carry from A
+  this.SBCAH = function(){
+	  var temp = this._registers.a - this._registers.h - (this._flags.carry ? 1 : 0);
+	  
+	  this._flags.halfCarry = ((this._registers.a & 0xF) - (this._registers.h & 0xF) - (this._flags.carry ? 1 : 0)) > 0xF;
+	  this._flags.carry = temp < 0;
+	  
+	  this._registers.a = temp & 0xFF;
+	  
+	  this._flags.zero = this._registers.a == 0;
+	  
+	  this._flags.subtract = true;
+	  	  
+	  this._registers.m = 1;
+	  this._registers.t = 4;
+  };
+
+  //SBC A, L #0x9D Subtract L and Carry from A
+  this.SBCAL = function(){
+	  var temp = this._registers.a - this._registers.l - (this._flags.carry ? 1 : 0);
+	  
+	  this._flags.halfCarry = ((this._registers.a & 0xF) - (this._registers.l & 0xF) - (this._flags.carry ? 1 : 0)) > 0xF;
+	  this._flags.carry = temp < 0;
+	  
+	  this._registers.a = temp & 0xFF;
+	  
+	  this._flags.zero = this._registers.a == 0;
+	  
+	  this._flags.subtract = true;
+	  	  
+	  this._registers.m = 1;
+	  this._registers.t = 4;
+  };
+  
+  //SBC A, (HL) #0x9E Subtract value at (HL) in memory and Carry from A
+  this.SBCAhl = function(){
+	  var fromMem = this._memoryUnit.readByte((this._registers.h << 8) + this._registers.l);	  
+	  var temp = this._registers.a - fromMem - (this._flags.carry ? 1 : 0);
+	  
+	  this._flags.halfCarry = ((this._registers.a & 0xF) - (fromMem & 0xF) - (this._flags.carry ? 1 : 0)) > 0xF;
+	  this._flags.carry = temp < 0;
+	  
+	  this._registers.a = temp & 0xFF;
+	  
+	  this._flags.zero = this._registers.a == 0;
+	  
+	  this._flags.subtract = true;
+	  
+	  this._registers.m = 2;
+	  this._registers.t = 8;
+  };
+  
+  //SBC A, A #0x9F Subtract A and Carry from A
+  this.SBCAB = function(){
+	  var temp = this._registers.a - this._registers.a - (this._flags.carry ? 1 : 0);
+	  
+	  this._flags.halfCarry = ((this._registers.a & 0xF) - (this._registers.a & 0xF) - (this._flags.carry ? 1 : 0)) > 0xF;
+	  this._flags.carry = temp < 0;
+	  
+	  this._registers.a = temp & 0xFF;
+	  
+	  this._flags.zero = this._registers.a == 0;
+	  
+	  this._flags.subtract = true;
+	  	  
+	  this._registers.m = 1;
+	  this._registers.t = 4;
+  };
+  /**---------------------End SBC Operations----------------------------------**/
+  
   
   /**---------------------PUSH Operations-------------------------------------**/
 
@@ -422,9 +692,9 @@ var Z80 = function(){
     ));
     this._registers.m = 3; this._registers.t = 12;
   };
-  /**---------------------End PUSH Operations-------------------------------------**/
+  /**---------------------End PUSH Operations---------------------------------**/
 
-  /**---------------------POP Operations-------------------------------------**/
+  /**---------------------POP Operations--------------------------------------**/
 
   //POP BC #0xC1
   this.POP_bc = function(){
@@ -1864,9 +2134,25 @@ var Z80 = function(){
 	this.ADCAH,
 	this.ADCAL,
 	this.ADCAhl,
-	this.ADCAA
+	this.ADCAA,
 	
 	//90
+	this.SUBAB,
+	this.SUBAC,
+	this.SUBAD,
+	this.SUBAE,
+	this.SUBAH,
+	this.SUBAL,
+	this.SUBAhl,
+	this.SUBAA,
+	this.SBCAB,
+	this.SBCAC,
+	this.SBCAD,
+	this.SBCAE,
+	this.SBCAH,
+	this.SBCAL,
+	this.SBCAhl,
+	this.SBCAA
   ];
 
   this.init(...arguments); //Call init with arguments passed in.
