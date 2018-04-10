@@ -237,6 +237,25 @@ var Z80 = function(){
 	  this._registers.m = 3;
 	  this._registers.t = 12;
   };
+  
+  //ADD A, n #0xC6 Add 8b immediate to register A
+  this.ADDAn = function(){
+	  var temp = this._registers.a + this._memoryUnit.readByte(this._registers.pc);
+	  
+	  this._registers.pc++;
+	  this._registers.pc &= 0xFFFF;
+	  
+	  this._flags.halfCarry = (temp & 0xF) < (this._registers.a & 0xF);
+	  this._flags.carry = temp > 0xFF;
+	  
+	  this._registers.a = temp & 0xFF;
+	  
+	  this._flags.zero = this._registers.a == 0;
+	  this._flags.subtract = false;
+	  
+	  this._registers.m = 2;
+	  this._registers.t = 8;
+  };
 
   /**---------------------End ADD Operations----------------------------------**/
 
@@ -1865,7 +1884,7 @@ var Z80 = function(){
 	  }
   };
   
-  //JR C, n 0x30 Relative jump if carry flag is set
+  //JR C, n #0x30 Relative jump if carry flag is set
   this.JRC_n = function(){
 	  var temp = this._memoryUnit.readByte(this._registers.pc);
 	  if (temp > 127)
@@ -1882,7 +1901,56 @@ var Z80 = function(){
 	  }
   };
   
+  //JP NZ, nn #0xC2 Absolute jump to 16b location if not zero.
+  this.JPNZnn = function(){
+	  this._registers.m = 3;
+	  this._registers.t = 12;
+	  
+	  if(!this._flags.zero){
+		  this._registers.pc = this._memoryUnit.readWord(this._registers.pc);
+		  this._registers.m ++;
+		  this._registers.t += 4;
+	  } else this._registers.pc += 2;
+  };
+  
+  //JP nn #0xC3 Absolute jump to 16b location.
+  this.JPnn = function(){
+	  this._registers.pc = this._memoryUnit.readWord(this._registers.pc);
+	  this._registers.m = 3;
+	  this._registers.t = 12;
+  };
+  
   /**---------------End Jump Operations------------------------------------------**/
+  
+  /**-----------------Call Operations--------------------------------------------**/
+  
+  //CALL NZ, nn #0xC4
+  this.CALLNZnn = function(){
+	  this._registers.m = 3;
+	  this._registers.t = 12;
+	  
+	  if(!this._flags.zero){
+		  this._registers.pc -= 2;
+		  this._memoryUnit.writeWord(this._registers.sp, this._registers.pc + 2);
+		  this._registers.pc = this._memoryUnit.readWord(this._registers.pc);
+		  this._registers.m += 2;
+		  this._registers.t += 8;
+	  } else this._registers.pc += 2;
+  };
+  
+  //RST 0 #0xC7
+  this.RST0 = function(){
+	  this._registers.sp -= 2;
+	  this._registers.sp &= 0xFFFF;
+	  
+	  this._memoryUnit.writeWord(this._registers.sp, this._registers.pc);
+	  this._registers.pc = 0x00;
+	  
+	  this._registers.m = 3;
+	  this._registers.t = 12;
+  };
+  
+  /**---------------End Call Operations------------------------------------------**/
   
   /**-------------------AND Operations-------------------------------------------**/
   
@@ -2311,6 +2379,22 @@ var Z80 = function(){
   };  
   /**------------------END CP Operations-----------------------------------------**/
   
+  /**--------------------RET Operations------------------------------------------**/
+  
+  //RET NZ #0xC0 Return if not zero.
+  this.RETNZ = function(){
+	  this._registers.m = 1;
+	  this._registers.t = 4;
+	  
+	  if(!this._flags.zero){
+		  this._registers.pc = this._memoryUnit.readWord(this._registers.sp);
+		  this._registers.m += 2;
+		  this._registers.t += 8;
+	  }
+  };
+  
+  /**------------------ End RET Operations---------------------------------------**/
+  
   /**-------------------Misc Operations------------------------------------------**/
   
   //NOP  #0x00 (No-op)
@@ -2615,9 +2699,17 @@ var Z80 = function(){
 	this.CPH,
 	this.CPL,
 	this.CPhl,
-	this.CPA
+	this.CPA,
 	
 	// C0
+	this.RETNZ,
+	this.POP_bc,
+	this.JPNZnn,
+	this.JPnn,
+	this.CALLNZnn,
+	this.PUSH_bc,
+	this.ADDAn,
+	this.RST0
   ];
 
   this.init(...arguments); //Call init with arguments passed in.
