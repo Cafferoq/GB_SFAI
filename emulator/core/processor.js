@@ -2099,6 +2099,218 @@ var Z80 = function(){
   };  
   /**-----------------END XOR Operations-----------------------------------------**/
   
+  /**--------------------OR Operations-------------------------------------------**/
+  
+  //OR B 0xB0 Logical OR B against A
+  this.ORB = function(){
+	  this._registers.a |= this._registers.b;
+	  
+	  this._flags.zero = this._registers.a == 0;
+	  this._flags.halfCarry = false;
+	  this._flags.subtract = false;
+	  this._flags.carry = false;
+	  	
+      this._registers.m = 1;
+      this._registers.t = 4;
+  };
+  
+  //OR C 0xB1 Logical OR C against A
+  this.ORC = function(){
+	  this._registers.a |= this._registers.c;
+	  
+	  this._flags.zero = this._registers.a == 0;
+	  this._flags.halfCarry = false;
+	  this._flags.subtract = false;
+	  this._flags.carry = false;
+	  	
+      this._registers.m = 1;
+      this._registers.t = 4;
+  };
+ 
+  //OR D 0xB2 Logical OR D against A
+  this.ORD = function(){
+	  this._registers.a |= this._registers.d;
+	  
+	  this._flags.zero = this._registers.a == 0;
+	  this._flags.halfCarry = false;
+	  this._flags.subtract = false;
+	  this._flags.carry = false;
+	  	
+      this._registers.m = 1;
+      this._registers.t = 4;
+  };
+ 
+  //OR E 0xB3 Logical OR E against A
+  this.ORE = function(){
+	  this._registers.a |= this._registers.e;
+	  
+	  this._flags.zero = this._registers.a == 0;
+	  this._flags.halfCarry = false;
+	  this._flags.subtract = false;
+	  this._flags.carry = false;
+	  	
+      this._registers.m = 1;
+      this._registers.t = 4;
+  };
+ 
+  //OR H 0xB4 Logical OR H against A
+  this.ORH = function(){
+	  this._registers.a |= this._registers.h;
+	  
+	  this._flags.zero = this._registers.a == 0;
+	  this._flags.halfCarry = false;
+	  this._flags.subtract = false;
+	  this._flags.carry = false;
+	  	
+      this._registers.m = 1;
+      this._registers.t = 4;
+  };
+ 
+  //OR L 0xB5 Logical OR L against A
+  this.ORL = function(){
+	  this._registers.a |= this._registers.l;
+	  
+	  this._flags.zero = this._registers.a == 0;
+	  this._flags.halfCarry = false;
+	  this._flags.subtract = false;
+	  this._flags.carry = false;
+	  	
+      this._registers.m = 1;
+      this._registers.t = 4;
+  };
+  
+  //OR (HL) 0xB6 Logical OR of value at address (HL) against A
+  this.ORhl = function(){
+	  this._registers.a |= this._memoryUnit.readByte((this._registers.h << 8) + this._registers.l);
+	  
+	  this._flags.zero = this._registers.a == 0;
+	  this._flags.halfCarry = false;
+	  this._flags.subtract = false;
+	  this._flags.carry = false;
+	  	
+      this._registers.m = 2;
+      this._registers.t = 8;
+  };
+ 
+  //OR A 0xB7 Logical OR A against A
+  this.ORA = function(){
+	  // x OR x = x
+	  
+	  this._flags.zero = this._registers.a == 0;
+	  this._flags.halfCarry = false;
+	  this._flags.subtract = false;
+	  this._flags.carry = false;
+	  	
+      this._registers.m = 1;
+      this._registers.t = 4;
+  };  
+  /**------------------END OR Operations-----------------------------------------**/
+  
+  /**--------------------CP Operations-------------------------------------------**/
+  
+  //CP B 0xB8 Comparison B against A
+  this.CPB = function(){
+	  var temp = this._registers.a - this._registers.b;
+	  
+	  this._flags.halfCarry = (temp & 0xF) > (this._registers.a & 0xF);
+	  this._flags.carry = temp < 0;
+	  this._flags.zero = temp == 0;
+	  this._flags.subtract = true;
+	  	
+      this._registers.m = 1;
+      this._registers.t = 4;
+  };
+  
+  //CP C 0xB9 Comparison C against A
+  this.CPC = function(){
+	  var temp = this._registers.a - this._registers.c;
+	  
+	  this._flags.zero = temp == 0;
+	  this._flags.halfCarry = (temp & 0xF) > (this._registers.a & 0xF);
+	  this._flags.subtract = true;
+	  this._flags.carry = temp < 0;
+	  	
+      this._registers.m = 1;
+      this._registers.t = 4;
+  };
+ 
+  //CP D 0xBA Comparison D against A
+  this.CPD = function(){
+	  var temp = this._registers.a - this._registers.d;
+	  
+	  this._flags.zero = temp == 0;
+	  this._flags.halfCarry = (temp & 0xF) > (this._registers.a & 0xF);
+	  this._flags.subtract = true;
+	  this._flags.carry = temp < 0;
+	  	
+      this._registers.m = 1;
+      this._registers.t = 4;
+  };
+ 
+  //CP E 0xBB Comparison E against A
+  this.CPE = function(){
+	  var temp = this._registers.a - this._registers.e;
+	  
+	  this._flags.zero = temp == 0;
+	  this._flags.halfCarry = (temp & 0xF) > (this._registers.a & 0xF);
+	  this._flags.subtract = true;
+	  this._flags.carry = temp < 0;
+	  	
+      this._registers.m = 1;
+      this._registers.t = 4;
+  };
+ 
+  //CP H 0xBC Comparison H against A
+  this.CPH = function(){
+	  var temp = this._registers.a - this._registers.h;
+	  
+	  this._flags.zero = temp == 0;
+	  this._flags.halfCarry = (temp & 0xF) > (this._registers.a & 0xF);
+	  this._flags.subtract = true;
+	  this._flags.carry = temp < 0;
+	  	
+      this._registers.m = 1;
+      this._registers.t = 4;
+  };
+ 
+  //CP L 0xBD Comparison L against A
+  this.CPL = function(){
+	  var temp = this._registers.a - this._registers.l;
+	  
+	  this._flags.zero = temp == 0;
+	  this._flags.halfCarry = (temp & 0xF) > (this._registers.a & 0xF);
+	  this._flags.subtract = true;
+	  this._flags.carry = temp < 0;
+	  	
+      this._registers.m = 1;
+      this._registers.t = 4;
+  };
+  
+  //CP (HL) 0xBE Comparison of value at address (HL) against A
+  this.CPhl = function(){
+	  var temp = this._registers.a - this._memoryUnit.readByte((this._registers.h << 8) + this._registers.l);
+	  
+	  this._flags.zero = temp == 0;
+	  this._flags.halfCarry = (temp & 0xF) > (this._registers.a & 0xF);
+	  this._flags.subtract = true;
+	  this._flags.carry = temp < 0;
+	  	
+      this._registers.m = 2;
+      this._registers.t = 8;
+  };
+ 
+  //CP A 0xBF Comparison A against A
+  this.CPA = function(){
+	  this._flags.halfCarry = false;
+	  this._flags.carry = false;
+	  this._flags.subtract = true;
+	  this._flags.zero = true;
+	  
+      this._registers.m = 1;
+      this._registers.t = 4;
+  };  
+  /**------------------END CP Operations-----------------------------------------**/
+  
   /**-------------------Misc Operations------------------------------------------**/
   
   //NOP  #0x00 (No-op)
@@ -2385,9 +2597,27 @@ var Z80 = function(){
 	this.XORH,
 	this.XORL,
 	this.XORhl,
-	this.XORA
+	this.XORA,
 	
 	// B0
+	this.ORB,
+	this.ORC,
+	this.ORD,
+	this.ORE,
+	this.ORH,
+	this.ORL,
+	this.ORhl,
+	this.ORA,
+	this.CPB,
+	this.CPC,
+	this.CPD,
+	this.CPE,
+	this.CPH,
+	this.CPL,
+	this.CPhl,
+	this.CPA
+	
+	// C0
   ];
 
   this.init(...arguments); //Call init with arguments passed in.
