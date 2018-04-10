@@ -921,6 +921,125 @@ var Z80 = function(){
 	  this._registers.m = 1;
 	  this._registers.t = 4;
   };
+  
+  //LD (HL), B #0x70 Copy B into address (HL)
+  this.LDhlB = function(){
+	  this._memoryUnit.writeByte((this._registers.h << 8) + this._registers.l, this._registers.b);
+	  
+	  this._registers.m = 2;
+	  this._registers.t = 8;
+  };
+  
+  //LD (HL), C #0x71 Copy C into address (HL)
+  this.LDhlC = function(){
+	  this._memoryUnit.writeByte((this._registers.h << 8) + this._registers.l, this._registers.c);
+	  
+	  this._registers.m = 2;
+	  this._registers.t = 8;
+  };
+  
+  //LD (HL), D #0x72 Copy D into address (HL)
+  this.LDhlD = function(){
+	  this._memoryUnit.writeByte((this._registers.h << 8) + this._registers.l, this._registers.d);
+	  
+	  this._registers.m = 2;
+	  this._registers.t = 8;
+  };
+  
+  //LD (HL), E #0x73 Copy E into address (HL)
+  this.LDhlE = function(){
+	  this._memoryUnit.writeByte((this._registers.h << 8) + this._registers.l, this._registers.e);
+	  
+	  this._registers.m = 2;
+	  this._registers.t = 8;
+  };
+  
+  //LD (HL), H #0x74 Copy H into address (HL)
+  this.LDhlH = function(){
+	  this._memoryUnit.writeByte((this._registers.h << 8) + this._registers.l, this._registers.h);
+	  
+	  this._registers.m = 2;
+	  this._registers.t = 8;
+  };
+  
+  //LD (HL), L #0x75 Copy L into address (HL)
+  this.LDhlL = function(){
+	  this._memoryUnit.writeByte((this._registers.h << 8) + this._registers.l, this._registers.l);
+	  
+	  this._registers.m = 2;
+	  this._registers.t = 8;
+  };
+  
+  //LD (HL), A #0x77 Copy A into address (HL)
+  this.LDhlA = function(){
+	  this._memoryUnit.writeByte((this._registers.h << 8) + this._registers.l, this._registers.a);
+	  
+	  this._registers.m = 2;
+	  this._registers.t = 8;
+  };
+  
+  //LD A, B 0x78 Copy B into A
+  this.LDAB = function(){
+	  this._registers.a = this._registers.b;
+	  
+	  this._registers.m = 1;
+	  this._registers.t = 4;
+  };
+  
+  //LD A, C 0x79 Copy C into A
+  this.LDAC = function(){
+	  this._registers.a = this._registers.c;
+	  
+	  this._registers.m = 1;
+	  this._registers.t = 4;
+  };
+  
+  //LD A, D 0x7A Copy D into A
+  this.LDAD = function(){
+	  this._registers.a = this._registers.d;
+	  
+	  this._registers.m = 1;
+	  this._registers.t = 4;
+  };
+  
+  //LD A, E 0x7B Copy E into A
+  this.LDAE = function(){
+	  this._registers.a = this._registers.e;
+	  
+	  this._registers.m = 1;
+	  this._registers.t = 4;
+  };
+  
+  //LD A, H 0x7C Copy H into A
+  this.LDAH = function(){
+	  this._registers.a = this._registers.h;
+	  
+	  this._registers.m = 1;
+	  this._registers.t = 4;
+  };
+  
+  //LD A, L 0x6D Copy L into A
+  this.LDAL = function(){
+	  this._registers.a = this._registers.l;
+
+	  this._registers.m = 1;
+	  this._registers.t = 4;
+  };
+  
+  //LD A, (HL) 0x7E Load value at address (HL) to register A
+  this.LDA_hl = function(){
+	  this._registers.a = this._memoryUnit.readByte((this._registers.h << 8) + this._registers.l);
+	  
+	  this._registers.m = 2;
+	  this._registers.t = 8;
+  }; 
+  
+  //LD A, A 0x7F Copy A into A
+  this.LDLA = function(){
+	  //AND WE'RE DONE WITH THESE OPS
+	  this._registers.m = 1;
+	  this._registers.t = 4;
+  };
   /**------------------End LD Operation------------------------------------------**/
   
   
@@ -1368,6 +1487,11 @@ var Z80 = function(){
 	  //TODO
   };
   
+  //HALT #0x76 (Halt processor)
+  this.HALT = function(){
+	  //TODO
+  };
+  
   //CPL #0x2F (Compliment of A)
   this.CPL = function(){
 	this._registers.a ^= 0xFF;
@@ -1564,9 +1688,27 @@ var Z80 = function(){
 	this.LDLH,
 	this.LDLL,
 	this.LDL_hl,
-	this.LDLA
+	this.LDLA,
 	
 	// 70
+	this.LDhlB,
+	this.LDhlC,
+	this.LDhlD,
+	this.LDhlE,
+	this.LDhlH,
+	this.LDhlL,
+	this.HALT,
+	this.LDhlA,
+	this.LDAB,
+	this.LDAC,
+	this.LDAD,
+	this.LDAE,
+	this.LDAH,
+	this.LDAL,
+	this.LDA_hl,
+	this.LDAA
+	
+	//80
   ];
 
   this.init(...arguments); //Call init with arguments passed in.
