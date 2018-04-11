@@ -258,6 +258,17 @@ var Z80 = function(){
 	  this._registers.m = 2;
 	  this._registers.t = 8;
   };
+  
+  //ADD SP, d #0xE8 Add 8b signed immediate to SP
+  this.ADDSPd = function(){
+	  var temp = this._memoryUnit.readByte(this._registers.pc);
+	  if (temp > 127) temp = -((~i+1) & 0xFF);
+	  this._registers.pc ++;
+	  this._registers.sp += temp;
+	  
+	  this._registers.m = 4;
+	  this._registers.t = 16;
+  };
 
   /**---------------------End ADD Operations----------------------------------**/
 
@@ -1528,6 +1539,24 @@ var Z80 = function(){
 	  this._registers.m = 1;
 	  this._registers.t = 4;
   };
+  
+  //LDH (n), A #0xE0 Save register A to 0xFF00 + 8b immediate
+  this.LDHnA = function(){
+	  var fromMem = this._memoryUnit.readByte(this._registers.pc);
+	  this._memoryUnit.writeByte(0xFF00 + fromMem, this._registers.a);
+	  this._registers.pc ++;
+	  
+	  this._registers.m = 3;
+	  this._registers.t = 12;
+  };
+  
+  //LDH C, A #0xE2
+  this.LDHCA = function(){
+	  this._registers.a = this._memoryUnit.readByte(0xFF00 + this._registers.c);
+	  
+	  this._registers.m = 2;
+	  this._registers.t = 8;
+  };
   /**------------------End LD Operation------------------------------------------**/
   
   
@@ -2015,6 +2044,15 @@ var Z80 = function(){
 	  this._registers.t = 12;
   };
   
+  //JP (HL) #0xE9 Jump to (HL)
+  this.JPhl = function(){
+	  var hl = (this._registers.h << 8) + this._registers.l;
+	  this._registers.pc = hl;
+	  
+	  this._registers.m = 1;
+	  this._registers.t = 4;
+  };
+  
   /**---------------End Jump Operations------------------------------------------**/
   
   /**-----------------Call Operations--------------------------------------------**/
@@ -2135,6 +2173,16 @@ var Z80 = function(){
   };  
   
   //RST 20 #0xE7
+    this.RST20 = function(){
+	  this._registers.sp -= 2;
+	  this._registers.sp &= 0xFFFF;
+	  
+	  this._memoryUnit.writeWord(this._registers.sp, this._registers.pc);
+	  this._registers.pc = 0x20;
+	  
+	  this._registers.m = 3;
+	  this._registers.t = 12;
+  };  
   /**---------------End Call Operations------------------------------------------**/
   
   /**-------------------AND Operations-------------------------------------------**/
@@ -2242,6 +2290,21 @@ var Z80 = function(){
       this._registers.m = 1;
       this._registers.t = 4;
   };  
+  
+  //AND n #0xE6 Logical AND A against 8b immediate
+  this.ANDn = function(){
+	  this._registers.a &= this._memoryUnit.readByte(this._registers.pc);
+	  this._registers.pc ++;
+	  
+	  this._flags.zero = this._registers.a == 0;
+	  this._flags.halfCarry = true;
+	  this._flags.carry = false;
+	  this._flags.subtract = false;
+	  
+	  this._registers.m = 2;
+	  this._registers.t = 8;
+  };
+  
   /**-----------------END AND Operations-----------------------------------------**/
   
   /**-------------------XOR Operations-------------------------------------------**/
@@ -2987,10 +3050,19 @@ var Z80 = function(){
 	this.CALLCnn,
 	this.XX,
 	this.SBCAn,
-	this.RST18
+	this.RST18,
 	
 	//E0
-	
+	this.LDHnA,
+	this.POP_hl,
+	this.LDHCA,
+	this.XX,
+	this.XX,
+	this.PUSH_hl,
+	this.ANDn,
+	this.RST20,
+	this.ADDSPd,
+	this.JPhl
   ];
 
   this.init(...arguments); //Call init with arguments passed in.
