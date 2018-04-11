@@ -397,6 +397,25 @@ var Z80 = function(){
 	  this._registers.m = 1;
 	  this._registers.t = 4;
   };
+  
+  //ADC A, n #0xCE
+  this.ADCAn = function(){
+	  var fromMem = this._memoryUnit.readByte(this._registers.pc);
+	  this._registers.pc++;
+	  
+	  var tempSum = this._registers.a + fromMem + (this._flags.carry ? 1 : 0);
+	  
+	  this._flags.halfCarry = ((this._registers.a & 0xF) + (fromMem & 0xF) + (this._flags.carry ? 1 : 0)  & 0xF ) > 0xF;
+	  this._flags.carry = tempSum > 0xFF;
+	  
+	  this._registers.a = tempSum & 0xFF;
+	  
+	  this._flags.zero = this._registers.a == 0;
+	  this._flags.subtract = false;
+	  
+	  this._registers.m = 2;
+	  this._registers.t = 8;
+  };
   /**---------------------End ADC Operations----------------------------------**/
   
   /**---------------------SUB Operations--------------------------------------**/
@@ -1913,6 +1932,18 @@ var Z80 = function(){
 	  } else this._registers.pc += 2;
   };
   
+  //JP Z, nn #0xCA Absolute jump to 16b location if zero.
+  this.JPZnn = function(){
+	  this._registers.m = 3;
+	  this._registers.t = 12;
+	  
+	  if(this._flags.zero){
+		  this._registers.pc = this._memoryUnit.readWord(this._registers.pc);
+		  this._registers.m ++;
+		  this._registers.t += 4;
+	  } else this._registers.pc += 2;
+  };
+  
   //JP nn #0xC3 Absolute jump to 16b location.
   this.JPnn = function(){
 	  this._registers.pc = this._memoryUnit.readWord(this._registers.pc);
@@ -1938,6 +1969,30 @@ var Z80 = function(){
 	  } else this._registers.pc += 2;
   };
   
+  //CALL Z, nn #0xCC
+  this.CALLZnn = function(){
+	  this._registers.m = 3;
+	  this._registers.t = 12;
+	  
+	  if(this._flags.zero){
+		  this._registers.pc -= 2;
+		  this._memoryUnit.writeWord(this._registers.sp, this._registers.pc + 2);
+		  this._registers.pc = this._memoryUnit.readWord(this._registers.pc);
+		  this._registers.m += 2;
+		  this._registers.t += 8;
+	  } else this._registers.pc += 2;
+  };
+  
+  //CALL nn #0xCD
+  this.CALLnn = function(){
+	  this._registers.m = 5;
+	  this._registers.t = 20;
+	  
+	  this._registers.pc -= 2;
+	  this._memoryUnit.writeWord(this._registers.sp, this._registers.pc + 2);
+	  this._registers.pc = this._memoryUnit.readWord(this._registers.pc);
+	};
+  
   //RST 0 #0xC7
   this.RST0 = function(){
 	  this._registers.sp -= 2;
@@ -1950,6 +2005,17 @@ var Z80 = function(){
 	  this._registers.t = 12;
   };
   
+  //RST 8 #0xCF
+  this.RST8 = function(){
+	  this._registers.sp -= 2;
+	  this._registers.sp &= 0xFFFF;
+	  
+	  this._memoryUnit.writeWord(this._registers.sp, this._registers.pc);
+	  this._registers.pc = 0x8;
+	  
+	  this._registers.m = 3;
+	  this._registers.t = 12;
+  };
   /**---------------End Call Operations------------------------------------------**/
   
   /**-------------------AND Operations-------------------------------------------**/
@@ -2388,9 +2454,31 @@ var Z80 = function(){
 	  
 	  if(!this._flags.zero){
 		  this._registers.pc = this._memoryUnit.readWord(this._registers.sp);
+		  this._registers.sp += 2;
 		  this._registers.m += 2;
 		  this._registers.t += 8;
 	  }
+  };
+  
+  //RET Z #0xC8 Return if zero
+  this.RETZ = function(){
+	  this._registers.m = 1;
+	  this._registers.t = 4;
+	  
+	  if(this._flags.zero){
+		  this._registers.pc = this._memoryUnit.readWord(this._registers.sp);
+		  this._registers.sp += 2;
+		  this._registers.m += 2;
+		  this._registers.t += 8;
+	  } 
+  };
+  
+  //RET #0xC9 Return
+  this.RET = function(){
+	  this._registers.pc = this._memoryUnit.readWord(this._registers.sp);
+	  this._registers.sp += 2;
+	  this._registers.m += 3;
+	  this._registers.t += 12;
   };
   
   /**------------------ End RET Operations---------------------------------------**/
@@ -2478,6 +2566,11 @@ var Z80 = function(){
 	  
 	  this._registers.m = 1;
 	  this._registers.t = 4;
+  };
+  
+  //EXT ops #0xCB Extended operation, go to secondary table.
+  this.EXT_OPS = function(){
+	  //TODO
   };
   
   /**-------------------END Misc Operations---------------------------------------**/
@@ -2709,7 +2802,16 @@ var Z80 = function(){
 	this.CALLNZnn,
 	this.PUSH_bc,
 	this.ADDAn,
-	this.RST0
+	this.RST0,
+	this.RETZ,
+	this.RET,
+	this.JPZnn,
+	this.EXT_OPS,
+	this.CALLZnn,
+	this.CALLnn,
+	this.ADCAn,
+	this.RST8
+	
   ];
 
   this.init(...arguments); //Call init with arguments passed in.
