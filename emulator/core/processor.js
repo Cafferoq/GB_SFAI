@@ -28,6 +28,8 @@ var Z80 = function(){
       halfCarry : false,
       carry : false
     };
+	
+	this._ime = 1; //I wish I knew what IME stood for... 
 
     this._registers = {
       a:0, b:0, c:0, d:0, e:0, h:0, l:0,     //8b registers
@@ -545,6 +547,25 @@ var Z80 = function(){
 	  this._registers.m = 1;
 	  this._registers.t = 4;
   };
+  
+  //SUB A, n #0xD6 Subtract 8b immediate from register A
+  this.SUBAn = function(){
+	  var temp = this._registers.a - this._memoryUnit.readByte(this._registers.pc);
+	  
+	  this._registers.pc++;
+	  this._registers.pc &= 0xFFFF;
+	  
+	  this._flags.halfCarry = (temp & 0xF) < (this._registers.a & 0xF);
+	  this._flags.carry = temp > 0xFF;
+	  
+	  this._registers.a = temp & 0xFF;
+	  
+	  this._flags.zero = this._registers.a == 0;
+	  this._flags.subtract = false;
+	  
+	  this._registers.m = 2;
+	  this._registers.t = 8;
+  };
   /**---------------------End SUB Operations----------------------------------**/
   
   /**-----------------------SBC Operations------------------------------------**/
@@ -684,6 +705,25 @@ var Z80 = function(){
 	  	  
 	  this._registers.m = 1;
 	  this._registers.t = 4;
+  };
+  
+  //SBC A, n #0xDE
+  this.SBCAn = function(){
+	  var fromMem = this._memoryUnit.readByte(this._registers.pc);
+	  this._registers.pc++;
+	  
+	  var tempSum = this._registers.a - fromMem - (this._flags.carry ? 1 : 0);
+	  
+	  this._flags.halfCarry = ((this._registers.a & 0xF) - (fromMem & 0xF) - (this._flags.carry ? 1 : 0)  & 0xF ) < 0;
+	  this._flags.carry = tempSum < 0;
+	  
+	  this._registers.a = tempSum & 0xFF;
+	  
+	  this._flags.zero = this._registers.a == 0;
+	  this._flags.subtract = true;
+	  
+	  this._registers.m = 2;
+	  this._registers.t = 8;
   };
   /**---------------------End SBC Operations----------------------------------**/
   
@@ -1932,6 +1972,30 @@ var Z80 = function(){
 	  } else this._registers.pc += 2;
   };
   
+  //JP NC, nn #0xD2 Absolute jump to 16b location if no carry.
+  this.JPNCnn = function(){
+	  this._registers.m = 3;
+	  this._registers.t = 12;
+	  
+	  if(!this._flags.carry){
+		  this._registers.pc = this._memoryUnit.readWord(this._registers.pc);
+		  this._registers.m ++;
+		  this._registers.t += 4;
+	  } else this._registers.pc += 2;
+  };
+  
+  //JP C, nn #0xDA Absolute jump to 16b location if carry.
+  this.JPCnn = function(){
+	  this._registers.m = 3;
+	  this._registers.t = 12;
+	  
+	  if(this._flags.carry){
+		  this._registers.pc = this._memoryUnit.readWord(this._registers.pc);
+		  this._registers.m ++;
+		  this._registers.t += 4;
+	  } else this._registers.pc += 2;
+  };
+  
   //JP Z, nn #0xCA Absolute jump to 16b location if zero.
   this.JPZnn = function(){
 	  this._registers.m = 3;
@@ -1955,12 +2019,40 @@ var Z80 = function(){
   
   /**-----------------Call Operations--------------------------------------------**/
   
-  //CALL NZ, nn #0xC4
+  //CALL NZ, nn #0xC4 Call the procedure at 16b address if not zero
   this.CALLNZnn = function(){
 	  this._registers.m = 3;
 	  this._registers.t = 12;
 	  
 	  if(!this._flags.zero){
+		  this._registers.pc -= 2;
+		  this._memoryUnit.writeWord(this._registers.sp, this._registers.pc + 2);
+		  this._registers.pc = this._memoryUnit.readWord(this._registers.pc);
+		  this._registers.m += 2;
+		  this._registers.t += 8;
+	  } else this._registers.pc += 2;
+  };
+
+  //CALL NC, nn #0xD4 Call the procedure at 16b address if no carry
+  this.CALLNCnn = function(){
+	  this._registers.m = 3;
+	  this._registers.t = 12;
+	  
+	  if(!this._flags.carry){
+		  this._registers.pc -= 2;
+		  this._memoryUnit.writeWord(this._registers.sp, this._registers.pc + 2);
+		  this._registers.pc = this._memoryUnit.readWord(this._registers.pc);
+		  this._registers.m += 2;
+		  this._registers.t += 8;
+	  } else this._registers.pc += 2;
+  };
+  
+  //CALL C, nn #0xDC Call the procedure at 16b address if carry
+  this.CALLCnn = function(){
+	  this._registers.m = 3;
+	  this._registers.t = 12;
+	  
+	  if(this._flags.carry){
 		  this._registers.pc -= 2;
 		  this._memoryUnit.writeWord(this._registers.sp, this._registers.pc + 2);
 		  this._registers.pc = this._memoryUnit.readWord(this._registers.pc);
@@ -2016,6 +2108,33 @@ var Z80 = function(){
 	  this._registers.m = 3;
 	  this._registers.t = 12;
   };
+  
+  //RST 10 #0xD7
+  this.RST10 = function(){
+	  this._registers.sp -= 2;
+	  this._registers.sp &= 0xFFFF;
+	  
+	  this._memoryUnit.writeWord(this._registers.sp, this._registers.pc);
+	  this._registers.pc = 0x10;
+	  
+	  this._registers.m = 3;
+	  this._registers.t = 12;
+  };  
+  
+  
+  //RST 18 #0xDF
+  this.RST18 = function(){
+	  this._registers.sp -= 2;
+	  this._registers.sp &= 0xFFFF;
+	  
+	  this._memoryUnit.writeWord(this._registers.sp, this._registers.pc);
+	  this._registers.pc = 0x18;
+	  
+	  this._registers.m = 3;
+	  this._registers.t = 12;
+  };  
+  
+  //RST 20 #0xE7
   /**---------------End Call Operations------------------------------------------**/
   
   /**-------------------AND Operations-------------------------------------------**/
@@ -2459,6 +2578,19 @@ var Z80 = function(){
 		  this._registers.t += 8;
 	  }
   };
+
+  //RET NC #0xD0 Return if no carry.
+  this.RETNC = function(){
+	  this._registers.m = 1;
+	  this._registers.t = 4;
+	  
+	  if(!this._flags.carry){
+		  this._registers.pc = this._memoryUnit.readWord(this._registers.sp);
+		  this._registers.sp += 2;
+		  this._registers.m += 2;
+		  this._registers.t += 8;
+	  }
+  };
   
   //RET Z #0xC8 Return if zero
   this.RETZ = function(){
@@ -2471,6 +2603,29 @@ var Z80 = function(){
 		  this._registers.m += 2;
 		  this._registers.t += 8;
 	  } 
+  };
+  
+  //RET C #0xD8 Return if no carry.
+  this.RETC = function(){
+	  this._registers.m = 1;
+	  this._registers.t = 4;
+	  
+	  if(this._flags.carry){
+		  this._registers.pc = this._memoryUnit.readWord(this._registers.sp);
+		  this._registers.sp += 2;
+		  this._registers.m += 2;
+		  this._registers.t += 8;
+	  }
+  };
+  
+  //RETI #0xD9 Enable interrupts and return.
+  this.RETI = function(){
+	  this._ime = 1;
+	  this._registers.pc = this._memoryUnit.readWord(this._registers.sp);
+	  this._registers.sp += 2;
+	  
+	  this._registers.m = 3;
+	  this._registers.t = 12;
   };
   
   //RET #0xC9 Return
@@ -2571,6 +2726,10 @@ var Z80 = function(){
   //EXT ops #0xCB Extended operation, go to secondary table.
   this.EXT_OPS = function(){
 	  //TODO
+  };
+  
+  this.XX = function(){
+	  //Placeholder for unimplemented opcodes.
   };
   
   /**-------------------END Misc Operations---------------------------------------**/
@@ -2810,7 +2969,27 @@ var Z80 = function(){
 	this.CALLZnn,
 	this.CALLnn,
 	this.ADCAn,
-	this.RST8
+	this.RST8,
+	
+	// D0
+	this.RETNC,
+	this.POP_de,
+	this.JPNCnn,
+	this.XX,
+	this.CALLNCnn,
+	this.PUSH_de,
+	this.SUBAn,
+	this.RST10,
+	this.RETC,
+	this.RETI,
+	this.JPCnn,
+	this.XX,
+	this.CALLCnn,
+	this.XX,
+	this.SBCAn,
+	this.RST18
+	
+	//E0
 	
   ];
 
