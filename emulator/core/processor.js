@@ -3636,7 +3636,7 @@ var Z80 = function(){
 	this.BITHLg.bind(this, 0x08),
 	this.BITg.bind(this, 0x08, 'a'),
 	
-	// CB 60
+	// CB60
 	this.BITg.bind(this, 0x10, 'b'),
 	this.BITg.bind(this, 0x10, 'c'),
 	this.BITg.bind(this, 0x10, 'd'),
@@ -3652,7 +3652,25 @@ var Z80 = function(){
 	this.BITg.bind(this, 0x20, 'h'),
 	this.BITg.bind(this, 0x20, 'l'),
 	this.BITHLg.bind(this,0x20),
-	this.BITg.bind(this, 0x20, 'a')
+	this.BITg.bind(this, 0x20, 'a'),
+	
+	// CB70
+	this.BITg.bind(this, 0x40, 'b'),
+	this.BITg.bind(this, 0x40, 'c'),
+	this.BITg.bind(this, 0x40, 'd'),
+	this.BITg.bind(this, 0x40, 'e'),
+	this.BITg.bind(this, 0x40, 'h'),
+	this.BITg.bind(this, 0x40, 'l'),
+	this.BITHLg.bind(this, 0x40),
+	this.BITg.bind(this, 0x40, 'a'),
+	this.BITg.bind(this, 0x80, 'b'),
+	this.BITg.bind(this, 0x80, 'c'),
+	this.BITg.bind(this, 0x80, 'd'),
+	this.BITg.bind(this, 0x80, 'e'),
+	this.BITg.bind(this, 0x80, 'h'),
+	this.BITg.bind(this, 0x80, 'l'),
+	this.BITHLg.bind(this, 0x80),
+	this.BITg.bind(this, 0x80, 'a')
   ];
 
   this.init(...arguments); //Call init with arguments passed in.
