@@ -3634,7 +3634,25 @@ var Z80 = function(){
 	this.BITg.bind(this, 0x08, 'h'),
 	this.BITg.bind(this, 0x08, 'l'),
 	this.BITHLg.bind(this, 0x08),
-	this.BITg.bind(this, 0x08, 'a')
+	this.BITg.bind(this, 0x08, 'a'),
+	
+	// CB 60
+	this.BITg.bind(this, 0x10, 'b'),
+	this.BITg.bind(this, 0x10, 'c'),
+	this.BITg.bind(this, 0x10, 'd'),
+	this.BITg.bind(this, 0x10, 'e'),
+	this.BITg.bind(this, 0x10, 'h'),
+	this.BITg.bind(this, 0x10, 'l'),
+	this.BITHLg.bind(this, 0x10),
+	this.BITg.bind(this, 0x10, 'a'),
+	this.BITg.bind(this, 0x20, 'b'),
+	this.BITg.bind(this, 0x20, 'c'),
+	this.BITg.bind(this, 0x20, 'd'),
+	this.BITg.bind(this, 0x20, 'e'),
+	this.BITg.bind(this, 0x20, 'h'),
+	this.BITg.bind(this, 0x20, 'l'),
+	this.BITHLg.bind(this,0x20),
+	this.BITg.bind(this, 0x20, 'a')
   ];
 
   this.init(...arguments); //Call init with arguments passed in.
