@@ -1680,6 +1680,37 @@ var Z80 = function(){
       this._registers.t = 4;
   };
   
+  // Rotate register left with carry.
+  this.RLCg = function(register){
+	  this._flags.carry = this._registers[register] > 0x7F;
+	  this._registers[register] = ((this._registers[register] << 1) & 0xFF) | (this._flags.carry ? 1: 0);
+	  
+	  this._flags.halfCarry = false;
+	  this._flags.subtract = false;
+	  this._flags.zero = this._registers[register] == 0;
+	  
+	  this._registers.m = 2;
+	  this._registers.t = 8;
+  };
+  
+  // Rotate left and carry on value in HL
+  this.RLCHL = function(){
+	  var hl = (this._registers.h << 8)  + this._registers.l;
+	  var temp = this._memoryUnit.readByte(hl); 
+	  
+	  this._flags.carry = temp > 0x7F;
+	  temp = ((temp << 1) & 0xFF) | (this._flags.carry ? 1 : 0);
+	  
+	  this._memoryUnit.writeByte(hl, temp);
+	  
+	  this._flags.halfCarry = false;
+	  this._flags.subtract = false;
+	  this._flags.zero = temp == 0;
+	  
+	  this._registers.m = 4;
+	  this._registers.t = 16;
+  };
+  
   /**------------------End Rotate Operation--------------------------------------**/
   
   
@@ -2928,7 +2959,10 @@ var Z80 = function(){
   
   //EXT ops #0xCB Extended operation, go to secondary table.
   this.EXT_OPS = function(){
-	  //TODO
+	  var secondaryOp = this._memoryUnit.readByte(this._registers.pc);
+	  this._registers.pc++;
+	  
+	  if(
   };
   
   //DI #0xF3 Disable interrupts
@@ -3243,6 +3277,18 @@ var Z80 = function(){
 	this.XX,
 	this.CPn,
 	this.RST38
+  ];
+  
+  this._CBInstructionMap = [
+	// CBA0
+	this.RLCg.bind(this, 'b'),
+	this.RLCg.bind(this, 'c'),
+	this.RLCg.bind(this, 'd'),
+	this.RLCg.bind(this, 'e'),
+	this.RLCg.bind(this, 'h'),
+	this.RLCg.bind(this, 'l'),
+	this.RLCHL,
+	this.RLCg.bind(this, 'a'),
   ];
 
   this.init(...arguments); //Call init with arguments passed in.
