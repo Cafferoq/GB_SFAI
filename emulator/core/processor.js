@@ -1873,7 +1873,69 @@ var Z80 = function(){
 	  this._registers.t = 16;
   };
   
+  this.SRLg = function(register){
+	  this._flags.carry = (this._registers[register] & 0x01) == 0x01;
+	  this._registers[register] >>= 1;
+	  
+	  this._flags.halfCarry = false;
+	  this._flags.subtract = false;
+	  this._flags.zero = this._registers[register] == 0;
+	 
+	  this._registers.m = 2;
+	  this._registers.t = 8;
+  };
+  
+  this.SRLHL = function(){
+	  var hl = (this._registers.h << 8) | this._registers.l;
+	  var temp = this._memoryUnit.readByte(hl);
+	  
+	  this._flags.carry = (temp & 0x01) == 0x01;
+	  this._memoryUnit.writeByte(hl, temp >> 1);
+	  
+	  this._flags.carry = false;
+	  this._flags.subtract = false;
+	  this._flags.zero = temp < 2;
+	  
+	  this._registers.m = 4;
+	  this._registers.t = 16;
+  };
+  
   /**-------------------End Shift Operation--------------------------------------**/
+  
+  /**----------------------Swap Operation----------------------------------------**/
+  
+  this.SWAPg = function(register){
+	  this._registers[register] = ((this._registers[register] & 0xF) << 4) + (this._registers[register] >> 4);
+	  
+	  this._flags.zero = this._registers[register] == 0;
+	  this._flags.carry = false;
+	  this._flags.halfCarry = false;
+	  this._flags.subtract = false;
+	  
+	  //Documents unclear, guessing time values.
+	  this._registers.m = 2;
+	  this._registers.t = 8;
+  };
+  
+  this.SWAPHL = function(){
+	  var hl = (this._registers.h << 8) + this._registers.l;
+	  var temp = this._memoryUnit.readByte(hl);
+	  
+	  temp = ((temp & 0xF) << 4) | (temp >> 4);
+	  
+	  this._memoryUnit.writeByte(hl, temp);
+	  
+	  this._flags.zero = temp == 0;
+	  this._flags.carry = false;
+	  this._flags.halfCarry = false;
+	  this._flags.subtract = false;
+	  
+	  //Documents unclear, guessing time values.
+	  this._registers.m = 4;
+	  this._registers.t = 16;
+  };
+  
+  /**--------------------End Swap Operation--------------------------------------**/
   
   /**------------------- 8b INC Operation----------------------------------------**/  
   
@@ -3493,7 +3555,27 @@ var Z80 = function(){
 	this.SRAg.bind(this, 'h'),
 	this.SRAg.bind(this, 'l'),
 	this.SRAHL,
-	this.SRAg.bind(this, 'a')
+	this.SRAg.bind(this, 'a'),
+	
+	// CB30
+	this.SWAPg.bind(this, 'b'),
+	this.SWAPg.bind(this, 'c'),
+	this.SWAPg.bind(this, 'd'),
+	this.SWAPg.bind(this, 'e'),
+	this.SWAPg.bind(this, 'h'),
+	this.SWAPg.bind(this, 'l'),
+	this.SWAPHL,
+	this.SWAPg.bind(this, 'a'),
+	this.SRLg.bind(this, 'b'),
+	this.SRLg.bind(this, 'c'),
+	this.SRLg.bind(this, 'd'),
+	this.SRLg.bind(this, 'e'),
+	this.SRLg.bind(this, 'h'),
+	this.SRLg.bind(this, 'l'),
+	this.SRLHL,
+	this.SRLg.bind(this, 'a')
+	
+	// CB40
   ];
 
   this.init(...arguments); //Call init with arguments passed in.
