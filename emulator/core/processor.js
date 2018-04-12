@@ -1711,6 +1711,37 @@ var Z80 = function(){
 	  this._registers.t = 16;
   };
   
+  // Rotate register right with carry
+  this.RRCg = function(register){
+	  this._flags.carry = (this._registers[register] & 0x01) == 0x01;
+	  this._registers[register] = (this._flags.carry ? 0x80 : 0) | (this._registers[register] >> 1);
+	  
+	  this._flags.halfCarry = false;
+	  this._flags.subtract = false;
+	  this._flags.zero = this._registers[register] == 0;
+	  
+	  this._registers.m = 2;
+	  this._registers.t = 8;
+  };
+  
+  // Rotate right and carry on value in HL
+  this.RRCHL = function(){
+	  var hl = (this._registers.h << 8)  + this._registers.l;
+	  var temp = this._memoryUnit.readByte(hl); 
+	  
+	  this._flags.carry = (temp & 0x01) == 0x01;
+	  temp = (this._flags.carry ? 0x80 : 0) | (temp >> 1) ;
+	  
+	  this._memoryUnit.writeByte(hl, temp);
+	  
+	  this._flags.halfCarry = false;
+	  this._flags.subtract = false;
+	  this._flags.zero = temp == 0;
+	  
+	  this._registers.m = 4;
+	  this._registers.t = 16;
+  };
+  
   /**------------------End Rotate Operation--------------------------------------**/
   
   
@@ -3289,6 +3320,14 @@ var Z80 = function(){
 	this.RLCg.bind(this, 'l'),
 	this.RLCHL,
 	this.RLCg.bind(this, 'a'),
+	this.RRCg.bind(this, 'b'),
+	this.RRCg.bind(this, 'c'),
+	this.RRCg.bind(this, 'd'),
+	this.RRCg.bind(this, 'e'),
+	this.RRCg.bind(this, 'h'),
+	this.RRCg.bind(this, 'l'),
+	this.RRCHL,
+	this.RRCg.bind(this, 'a')
   ];
 
   this.init(...arguments); //Call init with arguments passed in.
