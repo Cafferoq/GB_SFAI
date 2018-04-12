@@ -1742,6 +1742,72 @@ var Z80 = function(){
 	  this._registers.t = 16;
   };
   
+  //Rotate left without carry on register
+  this.RLg = function(register){
+	  var tempCarry = this._registers[register] > 0x7F;
+	  this._registers[register] = ((this._registers[register] << 1) & 0xFF) | (this._flags.carry ? 1: 0);
+	  
+	  this._flags.halfCarry = false;
+	  this._flags.subtract = false;
+	  this._flags.carry = tempCarry;
+	  this._flags.zero = this._registers[register] == 0;
+	  
+	  this._registers.m = 2;
+	  this._registers.t = 8;
+  };
+  
+  // Rotate left on value in HL
+  this.RLHL = function(){
+	  var hl = (this._registers.h << 8)  + this._registers.l;
+	  var temp = this._memoryUnit.readByte(hl); 
+	  var tempCarry = temp > 0x7F;
+	  
+	  temp = ((temp << 1) & 0xFF) | (this._flags.carry ? 1 : 0);
+	  
+	  this._memoryUnit.writeByte(hl, temp);
+	  
+	  this._flags.carry = tempCarry;
+	  this._flags.halfCarry = false;
+	  this._flags.subtract = false;
+	  this._flags.zero = temp == 0;
+	  
+	  this._registers.m = 4;
+	  this._registers.t = 16;
+  };
+  
+  //Rotate right without carry on register
+  this.RRg = function(register){
+	  var tempCarry = (this._registers[register] & 0x01) == 0x01;
+	  this._registers[register] = (this._flags.carry ? 0x80: 0) | (this._registers[register] >> 1);
+	  
+	  this._flags.halfCarry = false;
+	  this._flags.subtract = false;
+	  this._flags.carry = tempCarry;
+	  this._flags.zero = this._registers[register] == 0;
+	  
+	  this._registers.m = 2;
+	  this._registers.t = 8;
+  };
+  
+  // Rotate right on value in HL
+  this.RRHL = function(){
+	  var hl = (this._registers.h << 8)  + this._registers.l;
+	  var temp = this._memoryUnit.readByte(hl); 
+	  var tempCarry = (temp & 0x01) == 0x7F;
+	  
+	  temp = (this._flags.carry ? 0x80 : 0) | (temp >> 1);
+	  
+	  this._memoryUnit.writeByte(hl, temp);
+	  
+	  this._flags.carry = tempCarry;
+	  this._flags.halfCarry = false;
+	  this._flags.subtract = false;
+	  this._flags.zero = temp == 0;
+	  
+	  this._registers.m = 4;
+	  this._registers.t = 16;
+  };
+  
   /**------------------End Rotate Operation--------------------------------------**/
   
   
@@ -3311,7 +3377,7 @@ var Z80 = function(){
   ];
   
   this._CBInstructionMap = [
-	// CBA0
+	// CB00
 	this.RLCg.bind(this, 'b'),
 	this.RLCg.bind(this, 'c'),
 	this.RLCg.bind(this, 'd'),
@@ -3327,7 +3393,25 @@ var Z80 = function(){
 	this.RRCg.bind(this, 'h'),
 	this.RRCg.bind(this, 'l'),
 	this.RRCHL,
-	this.RRCg.bind(this, 'a')
+	this.RRCg.bind(this, 'a'),
+	
+	// CB10
+	this.RLg.bind(this, 'b'),
+	this.RLg.bind(this, 'c'),
+	this.RLg.bind(this, 'd'),
+	this.RLg.bind(this, 'e'),
+	this.RLg.bind(this, 'h'),
+	this.RLg.bind(this, 'l'),
+	this.RLHL,
+	this.RLg.bind(this, 'a'),
+	this.RRg.bind(this, 'b'),
+	this.RRg.bind(this, 'c'),
+	this.RRg.bind(this, 'd'),
+	this.RRg.bind(this, 'e'),
+	this.RRg.bind(this, 'h'),
+	this.RRg.bind(this, 'l'),
+	this.RRHL,
+	this.RRg.bind(this, 'a')
   ];
 
   this.init(...arguments); //Call init with arguments passed in.
