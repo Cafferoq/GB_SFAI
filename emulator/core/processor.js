@@ -1937,6 +1937,31 @@ var Z80 = function(){
   
   /**--------------------End Swap Operation--------------------------------------**/
   
+  /**----------------------Bit Operation-----------------------------------------**/
+  
+  this.BITg = function(addr, register){
+	  this._flags.halfCarry = true;
+	  this._flags.subtract = false;
+	  this._flags.zero = (this._registers[register] & addr) == 0;
+	 
+	  this._registers.m = 2;
+	  this._registers.t = 8;
+  };
+  
+  this.BITHLg = function(addr){
+	  this._flags.halfCarry = true;
+	  this._flags.subtract = false;
+	  
+	  var hl = (this._registers.h << 8) + this._registers.l
+	  
+	  this._flags.zero = (this._memoryUnit.readByte(hl) & addr) == 0;
+	  
+	  this._registers.m = 3;
+	  this._registers.t = 12;
+  };
+  
+  /**--------------------End Bit Operation---------------------------------------**/
+  
   /**------------------- 8b INC Operation----------------------------------------**/  
   
   //INC B #0x04 Increment register B
@@ -3573,9 +3598,25 @@ var Z80 = function(){
 	this.SRLg.bind(this, 'h'),
 	this.SRLg.bind(this, 'l'),
 	this.SRLHL,
-	this.SRLg.bind(this, 'a')
+	this.SRLg.bind(this, 'a'),
 	
 	// CB40
+	this.BITg(0x01, 'b'),
+	this.BITg(0x01, 'c'),
+	this.BITg(0x01, 'd'),
+	this.BITg(0x01, 'e'),
+	this.BITg(0x01, 'h'),
+	this.BITg(0x01, 'l'),
+	this.BITHLg(0x01),
+	this.BITg(0x01, 'a'),
+	this.BITg(0x02, 'b'),
+	this.BITg(0x02, 'c'),
+	this.BITg(0x02, 'd'),
+	this.BITg(0x02, 'e'),
+	this.BITg(0x02, 'h'),
+	this.BITg(0x02, 'l'),
+	this.BITHLg(0x02),
+	this.BITg(0x02, 'a'),
   ];
 
   this.init(...arguments); //Call init with arguments passed in.
