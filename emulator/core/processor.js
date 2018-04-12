@@ -1569,6 +1569,55 @@ var Z80 = function(){
 	  this._registers.m = 4;
 	  this._registers.t = 16;
   };
+  
+  //LDH A, (n) #0xF0 Load value at FF00 + 8b immediate into register A
+  this.LDHAn = function(){
+	  var fromMem = this._memoryUnit.readByte(this._registers.pc);
+	  this._registers.a = this._memoryUnit.readByte(0xFF00 + fromMem);
+	  this._registers.pc ++;
+	  
+	  this._registers.m = 3;
+	  this._registers.t = 12;
+  };
+  
+  //LDH A, C #0xF2?
+  
+  //LDHL SP, d #0xF8
+  this.LDHLSPd = function(){
+	  var temp = this._memoryUnit.readByte(this._registers.pc);
+	  
+	  if(temp > 127) temp = -((~temp + 1) & 0xFF);
+	  this._registers.pc ++;
+	  temp += this._registers.sp;
+	  
+	  this._registers.h = (temp >> 8) & 0xFF;
+	  this._registers.l = temp & 0xFF;
+	  
+	  this._registers.m = 3;
+	  this._registers.t = 12;
+  };
+  
+  //LD SP, HL #0xF9 Copy HL to SP
+  this.LDSPHL = function(){
+	  var hl = (this._registers.h << 8) + this._registers.l;
+	  
+	  this._registers.sp = hl;
+	  
+	  //These numbers are total guess work. The documents i'm reading from are inconsistent at best.
+	  this._registers.m = 2;
+	  this._registers.t = 8;
+  };
+  
+  //LD A, (nn) #0xFA
+  this.LDAnn = function(){
+	  var fromMem = this._memoryUnit.readWord(this._registers.pc);
+	  this._registers.a = this._memoryUnit.readByte(fromMem);
+	  this._registers.pc += 2;
+	  
+	  this._registers.m = 4;
+	  this._registers.t = 16;
+  };
+  
   /**------------------End LD Operation------------------------------------------**/
   
   
@@ -2207,7 +2256,30 @@ var Z80 = function(){
 	  this._registers.m = 3;
 	  this._registers.t = 12;
   };  
+    
+  //RST 30 #0xF7
+    this.RST30 = function(){
+	  this._registers.sp -= 2;
+	  this._registers.sp &= 0xFFFF;
+	  
+	  this._memoryUnit.writeWord(this._registers.sp, this._registers.pc);
+	  this._registers.pc = 0x30;
+	  
+	  this._registers.m = 3;
+	  this._registers.t = 12;
+  };
   
+  //RST 38 #0xFF
+    this.RST38 = function(){
+	  this._registers.sp -= 2;
+	  this._registers.sp &= 0xFFFF;
+	  
+	  this._memoryUnit.writeWord(this._registers.sp, this._registers.pc);
+	  this._registers.pc = 0x38;
+	  
+	  this._registers.m = 3;
+	  this._registers.t = 12;
+  };
   /**---------------End Call Operations------------------------------------------**/
   
   /**-------------------AND Operations-------------------------------------------**/
@@ -2559,6 +2631,20 @@ var Z80 = function(){
       this._registers.m = 1;
       this._registers.t = 4;
   };  
+  
+  //OR n #0xF6 Logical OR 8b immediate against A0
+  this.XORn = function(){
+	  this._registers.a |= this._memoryUnit.readByte(this._registers.pc);
+	  this._registers.pc ++;
+	  
+	  this._flags.zero = this._registers.a == 0;
+	  this._flags.subtract = false;
+	  this._flags.halfCarry = false;
+	  this._flags.carry = false;
+	  
+	  this._registers.m = 2;
+	  this._registers.t = 8;
+  };
   /**------------------END OR Operations-----------------------------------------**/
   
   /**--------------------CP Operations-------------------------------------------**/
@@ -2660,6 +2746,21 @@ var Z80 = function(){
 	  this._flags.carry = false;
 	  this._flags.subtract = true;
 	  this._flags.zero = true;
+	  
+      this._registers.m = 1;
+      this._registers.t = 4;
+  };  
+  
+  //CP n 0xFE Comparison 8b immediate against A
+  this.CPn = function(){
+	  var temp = this._registers.a;
+	  temp -= this._memoryUnit.readByte(this._registers.pc);
+	  this._registers.pc ++;
+	  
+	  this._flags.halfCarry = (temp & 0xF) > (this._registers.a & 0xF);
+	  this._flags.carry = temp < 0;
+	  this._flags.zero = temp == 0;
+	  this._flags.subtract = true;
 	  
       this._registers.m = 1;
       this._registers.t = 4;
@@ -2828,6 +2929,22 @@ var Z80 = function(){
   //EXT ops #0xCB Extended operation, go to secondary table.
   this.EXT_OPS = function(){
 	  //TODO
+  };
+  
+  //DI #0xF3 Disable interrupts
+  this.DI = function(){
+	  this._ime = 0;
+	  
+	  this._registers.m = 1;
+	  this._registers.t = 4;
+  };  
+  
+  //EI #0xFB Enable interrupts
+  this.EI = function(){
+	  this._ime = 1;
+	  
+	  this._registers.m = 1;
+	  this._registers.t = 4;
   };
   
   this.XX = function(){
@@ -3107,9 +3224,25 @@ var Z80 = function(){
 	this.XX,
 	this.XX,
 	this.XORn,
-	this.RST28
+	this.RST28,
 	
 	// F0
+	this.LDHAn,
+	this.POP_af,
+	this.XX,
+	this.DI,
+	this.XX,
+	this.PUSH_af,
+	this.ORn,
+	this.RST30,
+	this.LDHLSPd,
+	this.LDSPHL,
+	this.LDAnn,
+	this.EI,
+	this.XX,
+	this.XX,
+	this.CPn,
+	this.RST38
   ];
 
   this.init(...arguments); //Call init with arguments passed in.
