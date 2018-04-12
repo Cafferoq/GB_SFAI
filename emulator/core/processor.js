@@ -1557,6 +1557,18 @@ var Z80 = function(){
 	  this._registers.m = 2;
 	  this._registers.t = 8;
   };
+  
+  //LD (nn), A #0xEA
+  this.LDnnA = function(){
+	  var addr = this._memoryUnit.readWord(this._registers.pc);
+	  
+	  this._memoryUnit.writeByte(addr, this._registers.a);
+	  
+	  this._registers.pc += 2;
+	  
+	  this._registers.m = 4;
+	  this._registers.t = 16;
+  };
   /**------------------End LD Operation------------------------------------------**/
   
   
@@ -2183,6 +2195,19 @@ var Z80 = function(){
 	  this._registers.m = 3;
 	  this._registers.t = 12;
   };  
+  
+  //RST 28 #0xEF
+    this.RST28 = function(){
+	  this._registers.sp -= 2;
+	  this._registers.sp &= 0xFFFF;
+	  
+	  this._memoryUnit.writeWord(this._registers.sp, this._registers.pc);
+	  this._registers.pc = 0x28;
+	  
+	  this._registers.m = 3;
+	  this._registers.t = 12;
+  };  
+  
   /**---------------End Call Operations------------------------------------------**/
   
   /**-------------------AND Operations-------------------------------------------**/
@@ -2413,6 +2438,20 @@ var Z80 = function(){
       this._registers.m = 1;
       this._registers.t = 4;
   };  
+  
+  //XOR n #0xEE Logical XOR 8b immediate against A0
+  this.XORn = function(){
+	  this._registers.a ^= this._memoryUnit.readByte(this._registers.pc);
+	  this._registers.pc ++;
+	  
+	  this._flags.zero = this._registers.a == 0;
+	  this._flags.subtract = false;
+	  this._flags.halfCarry = false;
+	  this._flags.carry = false;
+	  
+	  this._registers.m = 2;
+	  this._registers.t = 8;
+  };
   /**-----------------END XOR Operations-----------------------------------------**/
   
   /**--------------------OR Operations-------------------------------------------**/
@@ -3052,7 +3091,7 @@ var Z80 = function(){
 	this.SBCAn,
 	this.RST18,
 	
-	//E0
+	// E0
 	this.LDHnA,
 	this.POP_hl,
 	this.LDHCA,
@@ -3062,7 +3101,15 @@ var Z80 = function(){
 	this.ANDn,
 	this.RST20,
 	this.ADDSPd,
-	this.JPhl
+	this.JPhl,
+	this.LDnnA,
+	this.XX,
+	this.XX,
+	this.XX,
+	this.XORn,
+	this.RST28
+	
+	// F0
   ];
 
   this.init(...arguments); //Call init with arguments passed in.
