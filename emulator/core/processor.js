@@ -1978,6 +1978,24 @@ var Z80 = function(){
 	  this._registers.t = 16;
   };
   
+  this.SETg = function(mask, register){
+	  this._registers[register] |= mask;
+	  
+	  this._registers.m = 2;
+	  this._registers.t = 8;
+  };
+  
+  this.SETHLg = function(mask){
+	  var hl = (this._registers.h << 8) + this._registers.l;
+	  var temp = this._memoryUnit.readByte(hl);
+	  
+	  this._memoryUnit.writeByte(hl, temp | mask);
+	  
+	  //Gotta love guess work
+	  this._registers.m = 4;
+	  this._registers.t = 16;
+  };
+  
   /**--------------------End Bit Operation---------------------------------------**/
   
   /**------------------- 8b INC Operation----------------------------------------**/  
@@ -3760,7 +3778,25 @@ var Z80 = function(){
 	this.RESg.bind(this, 0x7F, 'h'),
 	this.RESg.bind(this, 0x7F, 'l'),
 	this.RESHLg.bind(this, 0x7F),
-	this.RESg.bind(this, 0x7F, 'a')
+	this.RESg.bind(this, 0x7F, 'a'),
+	
+	// CBC0
+	this.SETg.bind(this, 0x01, 'b'),
+	this.SETg.bind(this, 0x01, 'c'),
+	this.SETg.bind(this, 0x01, 'd'),
+	this.SETg.bind(this, 0x01, 'e'),
+	this.SETg.bind(this, 0x01, 'h'),
+	this.SETg.bind(this, 0x01, 'l'),
+	this.SETHLg.bind(this, 0x01),
+	this.SETg.bind(this, 0x01, 'a'),
+	this.SETg.bind(this, 0x02, 'b'),
+	this.SETg.bind(this, 0x02, 'c'),
+	this.SETg.bind(this, 0x02, 'd'),
+	this.SETg.bind(this, 0x02, 'e'),
+	this.SETg.bind(this, 0x02, 'h'),
+	this.SETg.bind(this, 0x02, 'l'),
+	this.SETHLg.bind(this, 0x02),
+	this.SETg.bind(this, 0x02, 'a')
 	
   ];
 
