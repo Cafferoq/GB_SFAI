@@ -216,6 +216,168 @@ describe("Z80 Processor", function(){
 			expect(processor._flags.carry).toBe(true);
 		});
 		
+		test("ADD A, E #0x83", function(){
+			processor._registers.a = 10;
+			processor._registers.e = 30;
+			processor._flags.subtract = true;
+			
+			processor.ADD_e();
+			
+			//Check the value
+			expect(processor._registers.a).toBe(40);
+
+			//Make sure subtract flag is set correctly
+			expect(processor._flags.subtract).toBe(false);
+			expect(processor._flags.zero).toBe(false);
+			
+			//Ensure correct clock time.
+			expect(processor._registers.m).toBe(1);
+			expect(processor._registers.t).toBe(4);
+			
+			processor.reset();
+			
+			processor._registers.a = 0;
+			processor._registers.e = 0;
+			
+			processor.ADD_e();
+			
+			expect(processor._flags.zero).toBe(true);
+			expect(processor._registers.a).toBe(0);
+			
+			processor.reset();
+			
+			processor._registers.a = 255;
+			processor._registers.e = 1;
+			
+			processor.ADD_e();
+			
+			expect(processor._registers.a).toBe(0);
+			expect(processor._flags.carry).toBe(true);
+		});
+		
+		test("ADD A, H #0x84", function(){
+			processor._registers.a = 10;
+			processor._registers.h = 30;
+			processor._flags.subtract = true;
+			
+			processor.ADD_h();
+			
+			//Check the value
+			expect(processor._registers.a).toBe(40);
+
+			//Make sure subtract flag is set correctly
+			expect(processor._flags.subtract).toBe(false);
+			expect(processor._flags.zero).toBe(false);
+			
+			//Ensure correct clock time.
+			expect(processor._registers.m).toBe(1);
+			expect(processor._registers.t).toBe(4);
+			
+			processor.reset();
+			
+			processor._registers.a = 0;
+			processor._registers.h = 0;
+			
+			processor.ADD_h();
+			
+			expect(processor._flags.zero).toBe(true);
+			expect(processor._registers.a).toBe(0);
+			
+			processor.reset();
+			
+			processor._registers.a = 255;
+			processor._registers.h = 1;
+			
+			processor.ADD_h();
+			
+			expect(processor._registers.a).toBe(0);
+			expect(processor._flags.carry).toBe(true);
+		});
+		
+		test("ADD A, L #0x85", function(){
+			processor._registers.a = 10;
+			processor._registers.l = 30;
+			processor._flags.subtract = true;
+			
+			processor.ADD_l();
+			
+			//Check the value
+			expect(processor._registers.a).toBe(40);
+
+			//Make sure subtract flag is set correctly
+			expect(processor._flags.subtract).toBe(false);
+			expect(processor._flags.zero).toBe(false);
+			
+			//Ensure correct clock time.
+			expect(processor._registers.m).toBe(1);
+			expect(processor._registers.t).toBe(4);
+			
+			processor.reset();
+			
+			processor._registers.a = 0;
+			processor._registers.l = 0;
+			
+			processor.ADD_l();
+			
+			expect(processor._flags.zero).toBe(true);
+			expect(processor._registers.a).toBe(0);
+			
+			processor.reset();
+			
+			processor._registers.a = 255;
+			processor._registers.l = 1;
+			
+			processor.ADD_l();
+			
+			expect(processor._registers.a).toBe(0);
+			expect(processor._flags.carry).toBe(true);
+		});
+		
+		test("ADD A, (hl) #0x86", function(){
+			processor._registers.a = 10;
+			
+			processor._memoryUnit.readByte = jest.fn();
+			processor._memoryUnit.readByte.mockReturnValueOnce(30);
+			
+			processor._flags.subtract = true;
+			
+			processor.ADDr_hl();
+			
+			//Check the value
+			expect(processor._registers.a).toBe(40);
+
+			//Make sure subtract flag is set correctly
+			expect(processor._flags.subtract).toBe(false);
+			expect(processor._flags.zero).toBe(false);
+			
+			//Ensure correct clock time.
+			expect(processor._registers.m).toBe(2);
+			expect(processor._registers.t).toBe(8);
+			
+			processor.reset();
+			
+			processor._registers.a = 0;
+			processor._memoryUnit.readByte.mockReturnValueOnce(0);
+			
+			processor.ADDr_hl();
+			
+			expect(processor._flags.zero).toBe(true);
+			expect(processor._registers.a).toBe(0);
+			
+			processor.reset();
+			
+			processor._registers.a = 255;
+			processor._memoryUnit.readByte.mockReturnValueOnce(1);
+			
+			
+			processor.ADDr_hl();
+			
+			expect(processor._registers.a).toBe(0);
+			expect(processor._flags.carry).toBe(true);
+			
+			expect(processor._memoryUnit.readByte).toHaveBeenCalledTimes(3);
+		});
+		
 		test("ADD A, A #0x87", function(){
 			processor._registers.a = 10;
 			processor._flags.subtract = true;
