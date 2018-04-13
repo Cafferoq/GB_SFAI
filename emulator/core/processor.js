@@ -3744,6 +3744,24 @@ var Z80 = function(){
 	this.RESHLg.bind(this, 0xDF),
 	this.RESg.bind(this, 0xDF, 'a'),
 	
+	// CBB0
+	this.RESg.bind(this, 0xBF, 'b'),
+	this.RESg.bind(this, 0xBF, 'c'),
+	this.RESg.bind(this, 0xBF, 'd'),
+	this.RESg.bind(this, 0xBF, 'e'),
+	this.RESg.bind(this, 0xBF, 'h'),
+	this.RESg.bind(this, 0xBF, 'l'),
+	this.RESHLg.bind(this, 0xBF),
+	this.RESg.bind(this, 0xBF, 'a'),
+	this.RESg.bind(this, 0x7F, 'b'),
+	this.RESg.bind(this, 0x7F, 'c'),
+	this.RESg.bind(this, 0x7F, 'd'),
+	this.RESg.bind(this, 0x7F, 'e'),
+	this.RESg.bind(this, 0x7F, 'h'),
+	this.RESg.bind(this, 0x7F, 'l'),
+	this.RESHLg.bind(this, 0x7F),
+	this.RESg.bind(this, 0x7F, 'a')
+	
   ];
 
   this.init(...arguments); //Call init with arguments passed in.
