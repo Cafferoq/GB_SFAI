@@ -3849,7 +3849,7 @@ var Z80 = function(){
 	this.SETg.bind(this, 0x80, 'e'),
 	this.SETg.bind(this, 0x80, 'h'),
 	this.SETg.bind(this, 0x80, 'l'),
-	this.SETHLg(this, 0x80),
+	this.SETHLg.bind(this, 0x80),
 	this.SETg.bind(this, 0x80, 'a')
   ];
 
