@@ -1937,7 +1937,7 @@ var Z80 = function(){
   
   /**--------------------End Swap Operation--------------------------------------**/
   
-  /**----------------------Bit Operation-----------------------------------------**/
+  /**-------------------Single Bit Operation-------------------------------------**/
   
   this.BITg = function(addr, register){
 	  this._flags.halfCarry = true;
@@ -1958,6 +1958,24 @@ var Z80 = function(){
 	  
 	  this._registers.m = 3;
 	  this._registers.t = 12;
+  };
+  
+  this.RESg = function(mask, register){
+	  this._registers[register] = mask;
+	  
+	  this._registers.m = 2;
+	  this._registers.t = 8;
+  };
+  
+  this.RESHLg = function(mask){
+	  var hl = (this._registers.h << 8) + this._registers.l;
+	  var temp = this._memoryUnit.readByte(hl);
+	  
+	  this._memoryUnit.writeByte(hl, temp & mask);
+	  
+	  //Gotta love guess work
+	  this._registers.m = 4;
+	  this._registers.t = 16;
   };
   
   /**--------------------End Bit Operation---------------------------------------**/
@@ -3670,7 +3688,25 @@ var Z80 = function(){
 	this.BITg.bind(this, 0x80, 'h'),
 	this.BITg.bind(this, 0x80, 'l'),
 	this.BITHLg.bind(this, 0x80),
-	this.BITg.bind(this, 0x80, 'a')
+	this.BITg.bind(this, 0x80, 'a'),
+	
+	// CB80
+	this.RESg.bind(this, 0xFE, 'b'),
+	this.RESg.bind(this, 0xFE, 'c'),
+	this.RESg.bind(this, 0xFE, 'd'),
+	this.RESg.bind(this, 0xFE, 'e'),
+	this.RESg.bind(this, 0xFE, 'h'),
+	this.RESg.bind(this, 0xFE, 'l'),
+	this.RESHLg.bind(this, 0xFE),
+	this.RESg.bind(this, 0xFE, 'a'),
+	this.RESg.bind(this, 0xFD, 'b'),
+	this.RESg.bind(this, 0xFD, 'c'),
+	this.RESg.bind(this, 0xFD, 'd'),
+	this.RESg.bind(this, 0xFD, 'e'),
+	this.RESg.bind(this, 0xFD, 'h'),
+	this.RESg.bind(this, 0xFD, 'l'),
+	this.RESHLg.bind(this, 0xFD),
+	this.RESg.bind(this, 0xFD, 'a')
   ];
 
   this.init(...arguments); //Call init with arguments passed in.
