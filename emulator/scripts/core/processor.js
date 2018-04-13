@@ -2301,7 +2301,7 @@ var Z80 = function(){
   this.JRNZ_n = function(){
 	  var temp = this._memoryUnit.readByte(this._registers.pc);
 	  if (temp > 127)
-		  temp = -((~temp & 0xFF);
+		  temp = -((~temp) & 0xFF);
 	  
 	  this._registers.pc++;
 	  this._registers.m = 2;
@@ -2318,7 +2318,7 @@ var Z80 = function(){
   this.JRZ_n = function(){
 	  var temp = this._memoryUnit.readByte(this._registers.pc);
 	  if (temp > 127)
-		  temp = -((~temp & 0xFF);
+		  temp = -((~temp) & 0xFF);
 	  
 	  this._registers.pc++;
 	  this._registers.m = 2;
@@ -2335,7 +2335,7 @@ var Z80 = function(){
   this.JRNC_n = function(){
 	  var temp = this._memoryUnit.readByte(this._registers.pc);
 	  if (temp > 127)
-		  temp = -((~temp & 0xFF);
+		  temp = -((~temp) & 0xFF);
 	  
 	  this._registers.pc++;
 	  this._registers.m = 2;
@@ -2352,7 +2352,7 @@ var Z80 = function(){
   this.JRC_n = function(){
 	  var temp = this._memoryUnit.readByte(this._registers.pc);
 	  if (temp > 127)
-		  temp = -((~temp & 0xFF);
+		  temp = -((~temp) & 0xFF);
 	  
 	  this._registers.pc++;
 	  this._registers.m = 2;
