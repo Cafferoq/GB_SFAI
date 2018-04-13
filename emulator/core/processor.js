@@ -3246,7 +3246,7 @@ var Z80 = function(){
 	  var secondaryOp = this._memoryUnit.readByte(this._registers.pc);
 	  this._registers.pc++;
 	  
-	  if(
+	  this._CBInstructionMap[opcode]();
   };
   
   //DI #0xF3 Disable interrupts
