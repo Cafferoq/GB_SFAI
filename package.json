@@ -1,6 +1,10 @@
 {
-  "name": "SNES_FAI",
+  "name": "GB_SFAI",
   "version": "0.0.0",
+  "description": "A GB Emulator with the ability to hook a neural network to it, written in JS.",
+  "scripts":{
+	"test": "jest"
+  },
   "dependencies": {
     "neataptic": "^1.4.7"
   },
