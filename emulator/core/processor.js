@@ -3814,7 +3814,25 @@ var Z80 = function(){
 	this.SETg.bind(this, 0x08, 'h'),
 	this.SETg.bind(this, 0x08, 'l'),
 	this.SETHLg.bind(this, 0x08),
-	this.SETg.bind(this, 0x08, 'a')
+	this.SETg.bind(this, 0x08, 'a'),
+	
+	// CDE0
+	this.SETg.bind(this, 0x10, 'b'),
+	this.SETg.bind(this, 0x10, 'c'),
+	this.SETg.bind(this, 0x10, 'd'),
+	this.SETg.bind(this, 0x10, 'e'),
+	this.SETg.bind(this, 0x10, 'h'),
+	this.SETg.bind(this, 0x10, 'l'),
+	this.SETHLg.bind(this, 0x10),
+	this.SETg.bind(this, 0x10, 'a'),
+	this.SETg.bind(this, 0x20, 'b'),
+	this.SETg.bind(this, 0x20, 'c'),
+	this.SETg.bind(this, 0x20, 'd'),
+	this.SETg.bind(this, 0x20, 'e'),
+	this.SETg.bind(this, 0x20, 'h'),
+	this.SETg.bind(this, 0x20, 'l'),
+	this.SETHLg.bind(this, 0x20),
+	this.SETg.bind(this, 0x20, 'a')
 	
   ];
 
