@@ -3832,8 +3832,25 @@ var Z80 = function(){
 	this.SETg.bind(this, 0x20, 'h'),
 	this.SETg.bind(this, 0x20, 'l'),
 	this.SETHLg.bind(this, 0x20),
-	this.SETg.bind(this, 0x20, 'a')
+	this.SETg.bind(this, 0x20, 'a'),
 	
+	// CDF0
+	this.SETg.bind(this, 0x40, 'b'),
+	this.SETg.bind(this, 0x40, 'c'),
+	this.SETg.bind(this, 0x40, 'd'),
+	this.SETg.bind(this, 0x40, 'e'),
+	this.SETg.bind(this, 0x40, 'h'),
+	this.SETg.bind(this, 0x40, 'l'),
+	this.SETHLg.bind(this, 0x40),
+	this.SETg.bind(this, 0x40, 'a'),
+	this.SETg.bind(this, 0x80, 'b'),
+	this.SETg.bind(this, 0x80, 'c'),
+	this.SETg.bind(this, 0x80, 'd'),
+	this.SETg.bind(this, 0x80, 'e'),
+	this.SETg.bind(this, 0x80, 'h'),
+	this.SETg.bind(this, 0x80, 'l'),
+	this.SETHLg(this, 0x80),
+	this.SETg.bind(this, 0x80, 'a')
   ];
 
   this.init(...arguments); //Call init with arguments passed in.
