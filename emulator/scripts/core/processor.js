@@ -3854,4 +3854,6 @@ var Z80 = function(){
   ];
 
   this.init(...arguments); //Call init with arguments passed in.
-}
+};
+
+module.exports = Z80;
