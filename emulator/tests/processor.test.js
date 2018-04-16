@@ -2,7 +2,7 @@ const Z80 = require("../scripts/core/processor.js");
 
 const processor = new Z80({});
 
-describe("Z80 Processor", function(){
+describe("Z80 Processor Init", function(){
 
 	beforeEach(function(){
 		processor.reset();
@@ -97,7 +97,9 @@ describe("Z80 Processor", function(){
 			
 		});
 	});
-	
+});
+
+describe("Z80 Processor ADD instructions", function(){
 	describe("ADD OP Codes", function(){
 		test("ADD A, B #0x80", function(){
 			processor._registers.a = 10;
@@ -410,6 +412,27 @@ describe("Z80 Processor", function(){
 			
 			expect(processor._registers.a).toBe(254);
 			expect(processor._flags.carry).toBe(true);
+		});
+		
+		test("ADD HL, BC #0x09", function(){
+			processor._registers.b = 0x01;
+			processor._registers.c = 0x01;
+			
+			processor._registers.h = 0x10;
+			processor._registers.l = 0x10;
+			
+			processor._flags.subtract = true;
+			
+			processor.ADDHL_BC();
+			
+			expect(processor._registers.h).toBe(0x11);
+			expect(processor._registers.l).toBe(0x11);
+			
+			expect(processor._flags.subtract).toBe(false);
+			expect(processor._flags.zero).toBe(false);
+			
+			expect(processor._registers.m).toBe(3);
+			expect(processor._registers.t).toBe(12);
 		});
 	});
 	
